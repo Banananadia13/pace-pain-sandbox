@@ -276,9 +276,9 @@ details.answer summary{cursor:pointer;font-weight:700;color:var(--accent);min-he
 
 
 /* v2 additions */
-:root{--guard0:#3A9A47;--guard1:#2F7FD0;--guard2:#D9A200;--guard3:#C83A2A;--fire0:#D7E0DD}
-@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){--guard0:#5BBF68;--guard1:#6AAEF0;--guard2:#F2C230;--guard3:#F0604E;--fire0:#33433F} }
-:root[data-theme="dark"]{--guard0:#5BBF68;--guard1:#6AAEF0;--guard2:#F2C230;--guard3:#F0604E;--fire0:#33433F}
+:root{--neut:#E07D95;--np:#B02F86;--stem:#4E9A3A;--guard0:#3A9A47;--guard1:#2F7FD0;--guard2:#D9A200;--guard3:#C83A2A;--fire0:#D7E0DD}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){--neut:#F39AAD;--np:#E474C4;--stem:#7CC46A;--guard0:#5BBF68;--guard1:#6AAEF0;--guard2:#F2C230;--guard3:#F0604E;--fire0:#33433F} }
+:root[data-theme="dark"]{--neut:#F39AAD;--np:#E474C4;--stem:#7CC46A;--guard0:#5BBF68;--guard1:#6AAEF0;--guard2:#F2C230;--guard3:#F0604E;--fire0:#33433F}
 .tools-right{display:flex;gap:8px;flex-wrap:wrap}
 .dg-head{fill:var(--surface);stroke:var(--ink);stroke-width:1.5}
 .dg-ear{fill:var(--damage);stroke:var(--ink);stroke-width:1}
@@ -305,10 +305,15 @@ details.answer summary{cursor:pointer;font-weight:700;color:var(--accent);min-he
 .ak-tip{fill:var(--pns)}
 .ak-capsule{fill:var(--surface);stroke:var(--muted);stroke-width:2.5}
 .ak-chem{fill:var(--signal)}
-.imm-mast circle{fill:var(--cns)}
-.imm-mast .imm-spikes{fill:none;stroke:var(--cns);stroke-width:3;stroke-dasharray:2 3}
-.imm-neut circle{fill:var(--pain);opacity:.85}
-.imm-t circle{fill:var(--cool);stroke:var(--surface);stroke-width:1.5;stroke-dasharray:2 2}
+.it{display:none}
+.imm[data-type="mast"] .it-mast,.imm[data-type="neut"] .it-neut,.imm[data-type="mac"] .it-mac,.imm[data-type="t"] .it-t{display:inline}
+.it-mast circle{fill:var(--cns)}
+.it-mast .imm-spikes{fill:none;stroke:var(--cns);stroke-width:3;stroke-dasharray:2 3}
+.it-neut circle{fill:var(--neut);opacity:.9}
+.it-mac ellipse,.it-mac circle{fill:var(--accent)}
+.it-mac circle.mac-nuc{fill:var(--surface);opacity:.75}
+.np{fill:var(--np)}
+.it-t circle{fill:var(--cool);stroke:var(--surface);stroke-width:1.5;stroke-dasharray:2 2}
 .gauge svg{display:block;width:100%;max-width:260px;margin:6px auto 0}
 .g-seg.dim{opacity:.3}
 .g-needle{transition:transform .5s ease}
@@ -409,6 +414,67 @@ details.answer summary{cursor:pointer;font-weight:700;color:var(--accent);min-he
   .bodytools .btn.small{min-height:34px;padding:4px 10px}
 }
 
+
+/* DOMS + immune updates */
+.heal-mode{margin-bottom:16px}
+.story a{color:var(--accent);font-weight:700;text-decoration:none;white-space:nowrap}
+.story a:hover{text-decoration:underline}
+.doms{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:18px;align-items:start}
+.doms-side{display:grid;gap:12px}
+.doms-side .figure-host svg{max-width:340px}
+.doms-time .ctl-top label{font-weight:700;font-size:14px}
+.doms-time output{white-space:nowrap}
+.stages{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:14px}
+.stage{border:1px solid var(--line);border-radius:12px;padding:8px 10px;background:var(--surface);text-align:left;cursor:pointer;display:grid;gap:2px;min-height:44px}
+.stage .when{font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.stage strong{font-size:14px;line-height:1.25}
+.stage[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.d-now{display:grid;gap:4px;padding:10px 12px;border-radius:12px;background:var(--surface-2);font-size:14px;line-height:1.45}
+.doms-notes{margin-top:18px}
+.doms-notes ul{margin:8px 0 0;padding-left:20px;display:grid;gap:6px;max-width:90ch}
+.d-warn{margin-top:12px;font-size:14px;padding:8px 12px;border-radius:10px;background:color-mix(in srgb,var(--pain) 10%,var(--surface));max-width:90ch}
+.dc-sore{stroke:var(--pain);stroke-width:3;fill:none}
+.dc-dmg{stroke:var(--damage);stroke-width:3;fill:none;stroke-dasharray:8 5}
+.dc-neut{fill:var(--neut);opacity:.32}
+.dc-mac{fill:var(--accent);opacity:.26}
+.dc-stem{fill:var(--stem);opacity:.3}
+.mf{fill:color-mix(in srgb,var(--pain) 20%,var(--surface));stroke:color-mix(in srgb,var(--pain) 38%,var(--surface));stroke-width:1}
+.mf-str{stroke:color-mix(in srgb,var(--pain) 42%,var(--surface));fill:none}
+.mt{fill:var(--surface)}
+.dn circle{fill:var(--neut)}
+.dm ellipse,.dm circle{fill:var(--warm);transition:fill .4s}
+.dm.repair ellipse,.dm.repair circle{fill:var(--accent)}
+.ds{fill:var(--stem)}
+@media (max-width:900px){.doms{grid-template-columns:minmax(0,1fr)}.stages{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+
+/* tendon 24-hour check */
+.heal-mode{flex-wrap:wrap}
+.ten-controls{display:flex;flex-wrap:wrap;gap:12px 24px;margin-bottom:10px}
+.ten-controls .ctl{display:grid;gap:4px}
+.ten-catch{font-size:14px;padding:8px 12px;border-radius:10px;background:var(--surface-2);margin-bottom:8px}
+.ten-catch.ok{background:color-mix(in srgb,var(--stem) 16%,var(--surface))}
+.ten-catch.behind{background:color-mix(in srgb,var(--warm) 14%,var(--surface))}
+.ten-caveat{font-size:13px;color:var(--muted);margin-top:10px;max-width:80ch}
+.ten-build{fill:var(--accent);opacity:.32}
+.ten-break{fill:var(--warm);opacity:.32}
+.ten-net{stroke:var(--ink);stroke-width:2.5;fill:none}
+.ten-cum{stroke:var(--muted);stroke-width:1.6;fill:none;stroke-dasharray:3 4}
+.ten-morn{fill:var(--signal);opacity:.12}
+.ten-sess{stroke:var(--ink);stroke-width:1.2;stroke-dasharray:2 3}
+.ten-five{stroke:var(--pain);stroke-width:1;stroke-dasharray:4 4;opacity:.6}
+.ten-read{display:grid;gap:10px}
+.ten-num{font-family:var(--f-display);font-size:40px;font-weight:700;line-height:1;color:var(--pain);font-variant-numeric:tabular-nums}
+.ten-num small{font-size:16px;color:var(--muted);font-weight:500}
+.pmm{display:grid;gap:8px;padding:12px;border:1px solid var(--line);border-radius:12px}
+.pmm-row{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.4}
+.tl{width:14px;height:14px;border-radius:50%;flex:none;margin-top:3px;box-shadow:inset 0 0 0 1px rgb(0 0 0 / .15)}
+.tl-g{background:#3A9A47}.tl-a{background:#E8B400}.tl-r{background:#C83A2A}
+.pmm-verdict{font-size:14px;line-height:1.4;padding:8px 10px;border-radius:10px}
+.tl-bg-g{background:color-mix(in srgb,#3A9A47 16%,var(--surface))}
+.tl-bg-a{background:color-mix(in srgb,#E8B400 20%,var(--surface))}
+.tl-bg-r{background:color-mix(in srgb,#C83A2A 14%,var(--surface))}
+
 /* Responsive */
 @media (max-width:1180px){
   .explore{grid-template-columns:minmax(0,1fr) 300px;grid-template-areas:"body read" "controls controls"}
@@ -492,7 +558,7 @@ details.answer summary{cursor:pointer;font-weight:700;color:var(--accent);min-he
   <section class="view" id="view-explore" hidden>
     <div class="presets">
       <div class="chips" id="preset-chips" role="group" aria-label="Scenarios"></div>
-      <div class="story" aria-live="polite"><strong id="story-name"></strong><span id="story-text" class="muted"></span></div>
+      <div class="story" aria-live="polite"><strong id="story-name"></strong><span id="story-text" class="muted"></span><a id="story-link" href="#doms" hidden>Why DOMS peaks at 48 hours →</a></div>
     </div>
     <div class="explore">
       <div class="controls" id="controls"></div>
@@ -555,6 +621,12 @@ details.answer summary{cursor:pointer;font-weight:700;color:var(--accent);min-he
 
   <!-- HEALING -->
   <section class="view" id="view-healing" hidden>
+    <div class="seg heal-mode" role="group" aria-label="Which timeline" id="heal-mode">
+      <button data-hm="injury" aria-pressed="true">After an injury</button>
+      <button data-hm="doms" aria-pressed="false">Muscle soreness after exercise (DOMS)</button>
+      <button data-hm="tendon" aria-pressed="false">After loading a tendon (24-hour check)</button>
+    </div>
+    <div id="heal-injury">
     <div style="display:grid;gap:6px;margin-bottom:16px">
       <h2 style="font-size:28px">Twin Peaks: protection over time</h2>
       <p class="muted" style="max-width:72ch">After an injury, your pain threshold drops further than your tissue tolerance. The gap between them is a protection zone. Drag through time to see how it changes as tissue heals.</p>
@@ -620,6 +692,100 @@ details.answer summary{cursor:pointer;font-weight:700;color:var(--accent);min-he
             <tr><td>Ligament, tendon, labrum, disc</td><td class="num">12–18 months</td></tr>
           </tbody>
         </table>
+      </div>
+    </div>
+    </div>
+    <div id="heal-doms" hidden>
+      <div style="display:grid;gap:6px;margin-bottom:16px">
+        <h2 style="font-size:28px">Why DOMS peaks around 48 hours</h2>
+        <p class="muted" style="max-width:76ch">After unfamiliar exercise, soreness builds over the next one to three days, even though the damage is tiny and already falling. The soreness follows the immune cells, not the damage. Drag through the hours to see what they are doing.</p>
+      </div>
+      <div class="doms">
+        <div class="panel">
+          <div class="chart-host"><svg id="doms-chart" viewBox="0 0 680 350" role="img" aria-label="DOMS timeline over five days: soreness peaks around 48 hours with macrophage activity, while muscle damage stays low and falls"></svg></div>
+          <div class="legend">
+            <span><i style="background:var(--pain)"></i>Soreness</span>
+            <span><i style="background:var(--damage)"></i>Muscle damage</span>
+            <span><i style="background:var(--neut);opacity:.5;height:12px"></i>Neutrophils</span>
+            <span><i style="background:var(--accent);opacity:.45;height:12px"></i>Macrophages</span>
+            <span><i style="background:var(--stem);opacity:.5;height:12px"></i>Muscle stem cells (repair)</span>
+          </div>
+          <div class="stages" id="doms-stages" role="group" aria-label="Stages after the workout"></div>
+        </div>
+        <div class="panel doms-side">
+          <div class="figure-host" id="doms-scene"></div>
+          <div class="ctl doms-time"><div class="ctl-top"><label for="d-time">Time since the workout</label><output id="d-time-out" class="num"></output></div><input type="range" id="d-time" min="0" max="120" step="1" value="48"></div>
+          <div class="meters h" id="doms-meters"></div>
+          <div class="fact"><span>Guard dog in the muscle</span><span class="pill" id="d-guard"></span></div>
+          <div class="d-now"><strong id="d-now-title"></strong><p id="d-now-text"></p></div>
+          <button class="btn" id="d-to-body">See this in the body</button>
+        </div>
+      </div>
+      <div class="panel doms-notes">
+        <h3>What this means for you</h3>
+        <ul>
+          <li>Soreness at 48 hours is a sign your muscles are adapting, not a sign of injury. Sore is not harm.</li>
+          <li>Gentle movement eases DOMS for a while. Go easier on the same muscles until it settles, then build up again.</li>
+          <li>Do the same session again and you will usually be much less sore. This is the repeated bout effect.</li>
+          <li>Scientists are still working out exactly what causes DOMS. This shows the leading explanation: immune cells and the muscle release messengers that make the sensors touchier while repair happens.</li>
+        </ul>
+        <p class="d-warn"><strong>See a doctor</strong> if the pain is severe and still getting worse after three days, the area is very swollen, or your urine turns dark brown after very hard exercise.</p>
+      </div>
+    </div>
+    <div id="heal-tendon" hidden>
+      <div style="display:grid;gap:6px;margin-bottom:16px">
+        <h2 style="font-size:28px">Tendons: the 24-hour check</h2>
+        <p class="muted" style="max-width:80ch">Tendons respond to load more slowly than muscle. After a heavy or springy session, collagen breakdown rises first and building catches up over the next few days. A sensitive tendon often feels fine during activity, then tells you the next morning whether the dose was right. This is different from muscle DOMS: next-day tendon pain is feedback about the dose, not a sign of adaptation.</p>
+      </div>
+      <div class="doms">
+        <div class="panel">
+          <div class="ten-controls">
+            <div class="ctl"><span class="eyebrow">This session was</span>
+              <div class="seg" role="group" aria-label="Session dose" id="ten-dose"><button data-dose="ok" aria-pressed="false">Within tolerance</button><button data-dose="much" aria-pressed="true">Too much</button></div></div>
+            <div class="ctl"><span class="eyebrow">Next heavy or springy session</span>
+              <div class="seg" role="group" aria-label="Load again at" id="ten-again"><button data-again="0" aria-pressed="true">None</button><button data-again="24" aria-pressed="false">24 h</button><button data-again="48" aria-pressed="false">48 h</button><button data-again="72" aria-pressed="false">72 h</button></div></div>
+          </div>
+          <p class="ten-catch" id="ten-catch"></p>
+          <div class="chart-host"><svg id="ten-chart" viewBox="0 0 680 452" role="img" aria-label="Tendon pain and collagen turnover over five days after loading"></svg></div>
+          <div class="legend">
+            <span><i style="background:var(--pain)"></i>Tendon pain</span>
+            <span><i style="background:var(--accent);opacity:.45;height:12px"></i>Collagen building</span>
+            <span><i style="background:var(--warm);opacity:.45;height:12px"></i>Collagen breakdown</span>
+            <span><i style="background:var(--ink)"></i>Net balance</span>
+            <span><i style="background:var(--muted);height:2px"></i>Running balance</span>
+          </div>
+          <p class="ten-caveat">The spacing choices are for heavy or springy loads, such as heavy calf raises, hopping, hill running or jumping. Lighter daily programs, such as Alfredson eccentric calf drops or isometric holds, also work well.</p>
+        </div>
+        <div class="panel doms-side">
+          <div class="ctl doms-time"><div class="ctl-top"><label for="t-time">Time since the first session</label><output id="t-time-out" class="num"></output></div><input type="range" id="t-time" min="0" max="120" step="1" value="24"></div>
+          <div class="ten-read">
+            <div><span class="eyebrow">Tendon pain now</span><div class="ten-num"><span id="t-pain">0</span><small>/10</small></div></div>
+            <div class="facts">
+              <div class="fact"><span>Collagen right now</span><span class="pill" id="t-now"></span></div>
+              <div class="fact"><span>Balance so far</span><span class="pill" id="t-bal"></span></div>
+            </div>
+          </div>
+          <div class="d-now"><strong id="t-phase-title"></strong><p id="t-phase-text"></p></div>
+          <div class="pmm">
+            <span class="eyebrow">Pain-monitoring check (Silbernagel)</span>
+            <div class="pmm-row" id="pmm-during"></div>
+            <div class="pmm-row" id="pmm-after"></div>
+            <div class="pmm-row" id="pmm-morning"></div>
+            <div class="pmm-verdict" id="pmm-verdict"></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel doms-notes">
+        <h3>What this means for you</h3>
+        <ul>
+          <li>Judge today’s session by how the tendon feels tomorrow morning, not during. Tendon pain often eases as you warm up.</li>
+          <li>Pain up to 5/10 during and after can be fine, as long as it has settled by the next morning and morning pain and stiffness are not creeping up week to week.</li>
+          <li>If it is worse tomorrow, the dose was too much. Ease off the next session, then build again.</li>
+          <li>Don’t stop loading altogether: tendons need load to get stronger. Isometric holds can settle pain.</li>
+          <li>Give heavy or springy sessions time for building to catch up, often 48–72 hours.</li>
+          <li>Tendon pain doesn’t match damage either. Scans can look worse than a tendon feels, or better.</li>
+        </ul>
+        <p class="tiny" style="text-align:left;margin-top:10px">Based on Silbernagel et al. 2007 (pain-monitoring model), Magnusson, Langberg &amp; Kjaer 2010 (collagen turnover after loading), Rio et al. 2013 (tendon pain) and Cook &amp; Purdam. Curves are illustrative.</p>
       </div>
     </div>
   </section>
@@ -782,6 +948,8 @@ const PRESETS=[
   {id:'fear',name:'Fear, no damage',story:'A friendly dog puts its paw on your leg. You have been scared of dogs since childhood.',take:'Pain without damage is still real pain.',target:2.8,v:{damage:0,load:1,touch:6,inflam:0,alarm:1,worst:10,stress:8,focus:9,understanding:5}}
 ];
 /*MODEL-END*/
+const PRESET_DAYS={doms:2,sprain1:0.5,sprainworst:0.5,sprain3:21,midgame:0.05,tendon:3,persistent:200,touch:300};
+PRESETS.forEach(p=>{if(PRESET_DAYS[p.id]!=null)p.v.time=PRESET_DAYS[p.id];});
 
 const presetById=id=>PRESETS.find(p=>p.id===id);
 
@@ -812,7 +980,7 @@ function load(){try{const raw=localStorage.getItem('pace-pain-v1');if(raw)Object
   (store.custom||[]).forEach(c=>LABELS[c.id]={label:c.label,type:c.type,cat:c.cat});
   (store.chips||[]).forEach(id=>{const L=LABELS[id];if(!L)return;(L.type==='dim'?state.dims:state.sims).add(id);});}
 
-function applyPreset(target,id,clearChips=false){const p=presetById(id);Object.assign(target,p.v);target.presetId=id;
+function applyPreset(target,id,clearChips=false){const p=presetById(id);Object.assign(target,p.v);target.presetId=id;target.storyOverride=null;
   if(clearChips&&target.dims){target.dims.clear();target.sims.clear();}}
 
 /* ---------- Healing ---------- */
@@ -1009,11 +1177,11 @@ function zoomSVG(){
   <g aria-hidden="true">
     <text class="svg-label" x="14" y="200">Danger nerve</text><text class="svg-sub" x="14" y="214">from the sensor</text>
     <text class="svg-label" x="14" y="340">Touch nerve</text><text class="svg-sub" x="14" y="354">touch and movement</text>
-    <text class="svg-label" x="300" y="286" text-anchor="middle">The gate</text><text class="svg-sub" x="300" y="300" text-anchor="middle">hears danger and touch</text>
+    <text class="svg-label" x="300" y="286" text-anchor="middle">The gate</text><text class="svg-sub" x="300" y="300" text-anchor="middle">hears danger and touch</text><text class="svg-small" x="300" y="313" text-anchor="middle">a WDR neuron</text>
     <text class="svg-label" x="330" y="30">To the brain</text>
     <text class="svg-label" x="446" y="96" text-anchor="end">Brake</text><text class="svg-sub" x="446" y="110" text-anchor="end">GABA, endorphins</text>
     <text class="svg-label" x="450" y="270" text-anchor="end">Accelerator</text><text class="svg-sub" x="450" y="284" text-anchor="end">adrenaline, cortisol</text>
-    <text class="svg-label" x="170" y="104" text-anchor="middle">Fire alarm</text><text class="svg-sub" x="170" y="118" text-anchor="middle">astrocytes</text>
+    <text class="svg-label" x="170" y="104" text-anchor="middle">Fire alarm</text><text class="svg-sub" x="170" y="118" text-anchor="middle">astrocytes, when activated</text>
     <text class="svg-label" x="404" y="316" text-anchor="middle">Microglia</text>
     <circle class="pulse-s" cx="20" cy="396" r="4"/><text class="svg-small" x="30" y="400">danger signal</text>
     <circle class="pulse-t" cx="116" cy="396" r="4"/><text class="svg-small" x="126" y="400">touch signal</text>
@@ -1067,13 +1235,20 @@ const AK_BR=['M150 170 C120 150 100 130 80 100','M150 170 C120 170 90 175 60 170
 const AK_TIPS=[[80,100],[60,170],[85,240],[130,80],[140,258]];
 const AK_SLOTS=[[100,130],[205,128],[48,214],[192,212],[118,262],[232,160],[40,128],[170,100],[240,240],[255,268],[228,98],[262,200]];
 const AK_TEARS=[[70,330],[160,330],[250,342],[100,342],[220,354],[130,354]];
-function immuneSVG(i,x,y){const t=i%3;
-  if(t===0)return `<g class="imm imm-mast"><circle class="imm-spikes" cx="${x}" cy="${y}" r="11.5"/><circle cx="${x}" cy="${y}" r="9"/></g>`;
-  if(t===1)return `<g class="imm imm-neut"><circle cx="${x-4}" cy="${y-2}" r="5.5"/><circle cx="${x+4}" cy="${y-2}" r="5.5"/><circle cx="${x}" cy="${y+4}" r="5.5"/></g>`;
-  return `<g class="imm imm-t"><circle cx="${x}" cy="${y}" r="8.5"/></g>`;}
+function immuneSVG(i,x,y){return `<g class="imm" data-type="none">
+  <g class="it it-mast"><circle class="imm-spikes" cx="${x}" cy="${y}" r="11.5"/><circle cx="${x}" cy="${y}" r="9"/></g>
+  <g class="it it-neut"><circle cx="${x-4}" cy="${y-2}" r="5.5"/><circle cx="${x+4}" cy="${y-2}" r="5.5"/><circle cx="${x}" cy="${y+4}" r="5.5"/></g>
+  <g class="it it-mac"><ellipse cx="${x+9}" cy="${y-5}" rx="6.5" ry="3.5" transform="rotate(-30 ${x+9} ${y-5})"/><ellipse cx="${x-9}" cy="${y+5}" rx="6.5" ry="3.5" transform="rotate(25 ${x-9} ${y+5})"/><circle cx="${x}" cy="${y}" r="10"/><circle class="mac-nuc" cx="${x+1}" cy="${y-1}" r="3.5"/></g>
+  <g class="it it-t"><circle cx="${x}" cy="${y}" r="8.5"/></g></g>`;}
+function immuneMix(days){const d=Math.max(0,days==null?1:days);
+  return {neut:Math.exp(-d/1.5),mast:0.35*Math.exp(-d/2)+0.08,mac:(d/2.5)*Math.exp(1-d/2.5)+0.1,t:0.6*(d/6)*Math.exp(1-d/6)+0.05};}
+function immuneOrder(n,days){const w=immuneMix(days),keys=Object.keys(w),sum=keys.reduce((a,k)=>a+w[k],0);
+  const exact=keys.map(k=>({k,v:n*w[k]/sum})),cnt={};let used=0;exact.forEach(e=>{cnt[e.k]=Math.floor(e.v);used+=cnt[e.k];});
+  exact.sort((a,b)=>(b.v%1)-(a.v%1)).slice(0,n-used).forEach(e=>cnt[e.k]++);
+  const order=[];const ks=keys.slice().sort((a,b)=>cnt[b]-cnt[a]);while(order.length<n){for(const k of ks){if(cnt[k]>0&&order.length<n){order.push(k);cnt[k]--;}}}return order;}
 function ankleSVG(){
   const fib=y=>`<path class="ak-fibre" d="M24 ${y} q20 -6 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t26 0"/>`;
-  return `<svg viewBox="0 0 460 410" role="img" aria-label="Close-up of the ankle: the danger nerve ending with immune cells, a touch sensor and the guard dog">
+  return `<svg viewBox="0 0 460 452" role="img" aria-label="Close-up of the ankle: the danger nerve ending with immune cells, a touch sensor and the guard dog">
   <rect class="ak-tissue" x="8" y="36" width="304" height="336" rx="24"/>
   <text class="svg-sub" x="24" y="60">Ankle tissue</text>
   ${fib(330)}${fib(342)}${fib(354)}
@@ -1095,10 +1270,12 @@ function ankleSVG(){
     <text class="svg-sub" x="452" y="214" text-anchor="end">to the spinal cord</text>
     <text class="svg-label" x="40" y="276">Touch sensor</text>
     <text class="svg-sub" x="452" y="326" text-anchor="end">touch nerve to the spinal cord</text>
-    <circle style="fill:var(--cns)" cx="20" cy="396" r="5"/><text class="svg-small" x="30" y="400">mast cell</text>
-    <circle style="fill:var(--pain)" cx="100" cy="396" r="5"/><text class="svg-small" x="110" y="400">neutrophil</text>
-    <circle style="fill:var(--cool)" cx="182" cy="396" r="5"/><text class="svg-small" x="192" y="400">T cell</text>
-    <circle class="ak-chem" cx="246" cy="396" r="3"/><text class="svg-small" x="256" y="400">chemical messengers</text>
+    <circle style="fill:var(--neut)" cx="20" cy="396" r="5"/><text class="svg-small" x="30" y="400">neutrophil (arrives first)</text>
+    <circle style="fill:var(--cns)" cx="170" cy="396" r="5"/><text class="svg-small" x="180" y="400">mast cell</text>
+    <circle style="fill:var(--accent)" cx="252" cy="396" r="5"/><text class="svg-small" x="262" y="400">macrophage (clean-up, then repair)</text>
+    <circle style="fill:var(--cool)" cx="20" cy="420" r="5"/><text class="svg-small" x="30" y="424">T cell (later)</text>
+    <circle class="ak-chem" cx="110" cy="420" r="3"/><text class="svg-small" x="120" y="424">immune messengers</text>
+    <circle class="np" cx="20" cy="444" r="3"/><text class="svg-small" x="30" y="448">nerve\u2019s messengers (CGRP, substance P)</text>
   </g></svg>`;
 }
 class AnkleScene{
@@ -1119,14 +1296,19 @@ class AnkleScene{
     if(!reduceMotion){
       this.acc+=dt*(0.5+1.1*m.N);while(this.acc>=1){this.acc-=1;this.spawn(m.N*m.S*(0.55+0.9*Math.random()));}
       this.tacc+=dt*(0.25+0.2*m.M);while(this.tacc>=1){this.tacc-=1;this.items.push({k:'touch',t:0,speed:240,c:this.dot('pulse-t',3.5)});}
+      this.nacc=(this.nacc||0)+dt*4*Math.max(0,m.N*m.S-1.2);
+      while(this.nacc>=1){this.nacc-=1;const [tx,ty]=AK_TIPS[Math.floor(Math.random()*AK_TIPS.length)],dx=tx-150,dy=ty-170,L=Math.hypot(dx,dy)||1,ang=(Math.random()-0.5)*1.4,ux=dx/L,uy=dy/L;
+        const vx=ux*Math.cos(ang)-uy*Math.sin(ang),vy=ux*Math.sin(ang)+uy*Math.cos(ang);this.items.push({k:'np',x0:tx,y0:ty,x1:tx+vx*30,y1:ty+vy*30,t:0,c:this.dot('np',2.4)});}
       const keep=[];
       for(const it of this.items){
+        if(it.k==='np'){it.t+=dt/1.6;if(it.t>=1){it.c.remove();continue;}it.c.setAttribute('cx',(it.x0+(it.x1-it.x0)*it.t).toFixed(1));it.c.setAttribute('cy',(it.y0+(it.y1-it.y0)*it.t).toFixed(1));it.c.setAttribute('opacity',(1-it.t*0.8).toFixed(2));keep.push(it);continue;}
         if(it.k==='br'){it.t+=dt*it.speed/this.brLen[it.i];if(it.t>=1){it.k='ax';it.t=0;}else{const pt=this.br[it.i].getPointAtLength((1-it.t)*this.brLen[it.i]);it.c.setAttribute('cx',pt.x.toFixed(1));it.c.setAttribute('cy',pt.y.toFixed(1));keep.push(it);continue;}}
         it.t+=dt*it.speed/this.len[it.k];if(it.t>=1){it.c.remove();continue;}
         const pt=this.paths[it.k].getPointAtLength(it.t*this.len[it.k]);it.c.setAttribute('cx',pt.x.toFixed(1));it.c.setAttribute('cy',pt.y.toFixed(1));keep.push(it);}
       this.items=keep;
     }
-    const n=clamp(Math.round(0.9*s.inflam+0.4*s.damage),0,12);
+    const n=clamp(Math.round(0.9*s.inflam+0.4*s.damage+1.2*Math.max(0,m.N*m.S-1.2)),0,12);
+    const key=n+'|'+Math.round((s.time??1)*4);if(key!==this.mixKey){this.mixKey=key;const order=immuneOrder(n,s.time);this.imm.forEach((g,i)=>g.dataset.type=order[i]||'none');}
     this.imm.forEach((g,i)=>{g.setAttribute('opacity',i<n?'1':'0');if(i<n&&!reduceMotion)g.setAttribute('transform',`translate(${(2*Math.sin(this.t*1.3+i)).toFixed(1)} ${(2*Math.cos(this.t*1.1+i*2)).toFixed(1)})`);});
     const nc=clamp(Math.round(s.inflam*3),0,30);
     this.chems.forEach((c,i)=>{if(i<nc){const dx=reduceMotion?0:4*Math.sin(this.t*0.8+c.ph),dy=reduceMotion?0:4*Math.cos(this.t*0.7+c.ph);c.c.setAttribute('cx',(c.x+dx).toFixed(1));c.c.setAttribute('cy',(c.y+dy).toFixed(1));c.c.setAttribute('opacity','0.9');}else c.c.setAttribute('opacity','0');});
@@ -1158,6 +1340,7 @@ function explain(s,m){const P=m.P,d=s.damage;
   if(m.pred>0.5&&m.T<0.6)return 'Almost no signal is getting through, but the brain predicts danger and creates pain to protect you. This pain is real.';
   if(m.w>=0.15&&((s.touch||0)+s.load)>=4&&d<=2)return 'The fire alarm at the gate has made it read touch and movement as danger. Gentle touch can hurt with no damage at all.'+exNote;
   if(P<0.6)return 'Some signal gets through, but the brake is on and the volume is turned right down.'+exNote;
+  if(guardLevel(s)>=2&&d<=2&&P>=d+1.5&&m.alarm<5&&m.a<0.3)return 'Damage is low, but immune cells and their messengers have woken the guard dog, so the sensor fires more easily. Sore is not harm: this is repair and adaptation under way.'+exNote;
   if(d>=4&&P<=d-2.5)return `There is real damage, but ${m.b>0.6?'feeling safe and focused elsewhere has put the brake on':'the brain judges the situation as fairly safe'}. Pain is lower than the damage.`+exNote;
   if(P>=d+2.5){const up=[];if(guardLevel(s)>=2)up.push('the guard dog at the ankle is awake');if(m.alarm>=5)up.push('the fire alarm has made the gate more sensitive');if(m.a>0.2)up.push('worry and stress are pressing the accelerator');if(m.b<0.38)up.push('the brake has weakened');
     return `Damage is ${d<=2?'low':'moderate'}, but ${joinList(up.length?up:['the system is on high alert'])}. Pain is higher than the damage.`+exNote;}
@@ -1196,7 +1379,7 @@ const CONTROLS=[
     {k:'touch',label:'Touch and pressure',sub:'A sock, a bedsheet, a hand, a dog’s paw',step:0.5},
     {k:'inflam',label:'Inflammation',sub:'Immune cells at the ankle wake the guard dog',step:0.5}]},
   {group:'Nervous system',color:'var(--pns)',items:[
-    {k:'alarm',label:'Fire alarm',sub:'Microglia and astrocytes at the gate',step:0.5},
+    {k:'alarm',label:'Fire alarm',sub:'Microglia and astrocytes. Normally they look after the gate; when activated they sound the alarm and make it more sensitive',step:0.5},
     {k:'time',label:'Time since injury',sub:'Follows the healing curve for a ligament',time:true}]},
   {group:'Brain',color:'var(--cns)',items:[
     {k:'worst',label:'Worst-case thinking',sub:'Also called catastrophising',step:0.5},
@@ -1210,7 +1393,7 @@ function buildControls(){const host=$('#controls');
   host.innerHTML=`<div class="panel ctl-panel">${CONTROLS.map(g=>`<div class="group"><div class="group-head"><span class="dot" style="background:${g.color}"></span><h3>${g.group}</h3></div>${g.items.map(row).join('')}</div>`).join('')}
     <p class="ctl-hint" id="ctl-hint" aria-live="polite">Drag a slider to see what it means.</p>
     <details class="quick"><summary>Add DIMs and SIMs <span class="q-count" id="quick-count"></span></summary><div class="chips" id="quick-chips"></div><a href="#my-plan" class="sub q-all">See all DIMs and SIMs</a></details></div>`;
-  CONTROLS.forEach(g=>g.items.forEach(it=>{if(it.time)return;$(`#c-${it.k}`).addEventListener('input',e=>{state[it.k]=+e.target.value;state.presetId=null;refresh();});}));
+  CONTROLS.forEach(g=>g.items.forEach(it=>{if(it.time)return;$(`#c-${it.k}`).addEventListener('input',e=>{state[it.k]=+e.target.value;state.presetId=null;state.storyOverride=null;refresh();});}));
   $('#c-time').addEventListener('input',e=>setTime(+e.target.value/1000*timeMax(),true));
   const showHint=el=>{const c=el.closest('.ctl');if(!c)return;const d=c.querySelector('.vh');$('#ctl-hint').innerHTML=`<strong>${c.dataset.hint}:</strong> ${d?d.textContent:''}`;};
   host.addEventListener('focusin',e=>{if(e.target.matches('input[type=range]'))showHint(e.target);});
@@ -1243,7 +1426,10 @@ function refresh(){const m=painModel(state);
   $$('[data-preset]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.preset===state.presetId?'true':'false'));
   const p=presetById(state.presetId);
   $('#story-name').textContent=p?p.name:'Your own scenario';
-  $('#story-text').textContent=p?`${p.story} ${p.take}`:'You have changed the sliders. Pick a scenario above to load a story.';
+  const so=!p&&state.storyOverride;if(so)$('#story-name').textContent=so.name;
+  $('#story-text').textContent=p?`${p.story} ${p.take}`:so?so.text:'You have changed the sliders. Pick a scenario above to load a story.';
+  {const sl=$('#story-link'),isT=state.presetId==='tendon';sl.hidden=!(state.presetId==='doms'||isT||(so&&so.doms));
+   sl.href=isT?'#tendon':'#doms';sl.textContent=isT?'The 24-hour check for tendons \u2192':'Why DOMS peaks at 48 hours \u2192';}
   explorMeters.set(state.damage,m.P);healMeters.set(state.damage,m.P);planMeters.set(state.damage,m.P);
   const why=explain(state,m);if($('#why').textContent!==why)$('#why').textContent=why;
   setPill('#f-gate',m.T<=0?'Closed':m.T<1.5?'Partly open':'Open',m.T<=0?'':m.T<1.5?'part':'open');
@@ -1337,9 +1523,159 @@ function syncQ(){$$('[data-q1]').forEach(b=>b.setAttribute('aria-pressed',b.data
   $('#rv-q2').textContent=store.q2?`Your first answer: ${store.q2}`:'You did not answer at the start.';
   $('#rv-q3').textContent=store.q3?`Your first answer: ${store.q3}`:'You did not answer at the start.';}
 
+
+/* ---------- DOMS timeline ---------- */
+const DOMS={neut:t=>(t/12)*Math.exp(1-t/12),mac:t=>Math.pow(t/48,2)*Math.exp(2-2*t/48),stem:t=>Math.pow(t/84,2)*Math.exp(2-2*t/84),
+  sore:t=>t<=0?0:3.5*Math.exp(-Math.pow(Math.log(t/48),2)/0.72),dmg:t=>1.5*Math.exp(-t/72)};
+const DOMS_STAGES=[
+  {a:0,b:5,when:'0–5 h',title:'The workout',text:'Unfamiliar exercise, especially lowering or downhill work, puts tiny strains on muscle fibres. There is very little real damage, and you usually feel fine.'},
+  {a:6,b:20,when:'6–20 h',title:'First responders',text:'Neutrophils arrive first to tidy up. Soreness has barely started.'},
+  {a:21,b:72,when:'1–3 days',title:'Peak soreness',text:'Macrophages build up and, with the muscle itself, release messengers such as bradykinin and nerve growth factor. These make the sensors in the muscle touchier, so stairs, stretching and squeezing hurt. The guard dog is alert, but damage is low and falling.'},
+  {a:73,b:108,when:'3–4½ days',title:'Repair mode',text:'Macrophages switch from clean-up to repair. Their growth signals wake muscle stem cells (satellite cells), which rebuild and strengthen the fibres. Soreness fades.'},
+  {a:109,b:120,when:'5 days +',title:'Adapted',text:'The muscle is repaired and better prepared. Do the same session again and you will usually be much less sore. This is the repeated bout effect.'}];
+let domsT=48;
+const domsStage=t=>DOMS_STAGES.find(st=>t>=st.a&&t<=st.b)||DOMS_STAGES[DOMS_STAGES.length-1];
+function domsInputs(t){return {damage:Math.round(DOMS.dmg(t)*2)/2,inflam:Math.round(Math.min(10,6*DOMS.mac(t)+2*DOMS.neut(t))*2)/2};}
+function fmtHours(t){return t<24?`${t} h`:`${t} h · day ${Math.floor(t/24)}${t%24?'':''}`;}
+function renderDomsChart(){const svg=$('#doms-chart');const W=680,H=350,L=46,R=112,T=34,B=48,pw=W-L-R,ph=H-T-B,ymax=6;
+  const X=t=>L+t/120*pw,Y=v=>T+ph-(v/ymax)*ph;const ts=[];for(let i=0;i<=240;i++)ts.push(i/2);
+  const line=f=>'M'+ts.map(t=>X(t).toFixed(1)+' '+Y(f(t)).toFixed(1)).join('L');
+  const area=f=>line(f)+`L${X(120).toFixed(1)} ${Y(0)}L${X(0)} ${Y(0)}Z`;
+  const ticks=[0,24,48,72,96,120].map(t=>`<line class="peaks-grid" x1="${X(t)}" x2="${X(t)}" y1="${T}" y2="${T+ph}"/><text class="svg-small" x="${X(t)}" y="${T+ph+18}" text-anchor="middle">${t} h</text>`).join('');
+  const yt=[0,2,4,6].map(v=>`<text class="svg-small" x="${L-8}" y="${Y(v)+4}" text-anchor="end">${v}</text>`).join('');
+  const st=domsStage(domsT),xn=X(domsT);
+  svg.innerHTML=`${ticks}${yt}
+   <path class="dc-neut" d="${area(t=>5.2*DOMS.neut(t))}"/><path class="dc-mac" d="${area(t=>5.2*DOMS.mac(t))}"/><path class="dc-stem" d="${area(t=>2.8*DOMS.stem(t))}"/>
+   <line class="peaks-axis" x1="${L}" x2="${L}" y1="${T}" y2="${T+ph}"/><line class="peaks-axis" x1="${L}" x2="${L+pw}" y1="${T+ph}" y2="${T+ph}"/>
+   <text class="svg-sub" x="${L}" y="${T-14}">Soreness and damage (0–10); shaded areas show cell activity</text>
+   <text class="svg-sub" x="${(L+pw/2).toFixed(1)}" y="${H-8}" text-anchor="middle">Hours after the workout</text>
+   <line class="peaks-injury" x1="${X(48)}" x2="${X(48)}" y1="${T}" y2="${T+ph}"/><text class="svg-small" x="${X(48)+4}" y="${T+12}">soreness peaks ≈ 48 h</text>
+   <path class="dc-dmg" d="${line(DOMS.dmg)}"/><path class="dc-sore" d="${line(DOMS.sore)}"/>
+   <line class="peaks-now" x1="${xn.toFixed(1)}" x2="${xn.toFixed(1)}" y1="${T}" y2="${T+ph}"/>
+   <circle style="fill:var(--pain)" cx="${xn.toFixed(1)}" cy="${Y(DOMS.sore(domsT)).toFixed(1)}" r="5"/><circle style="fill:var(--damage)" cx="${xn.toFixed(1)}" cy="${Y(DOMS.dmg(domsT)).toFixed(1)}" r="5"/>
+   <text class="svg-label" style="fill:var(--pain);font-size:13px" x="${L+pw+8}" y="${Y(DOMS.sore(120))-2}">Soreness</text>
+   <text class="svg-label" style="fill:var(--damage);font-size:13px" x="${L+pw+8}" y="${Y(DOMS.dmg(120))+16}">Muscle damage</text>`;}
+const DS_FIB=[30,64,98,132,166],DS_TEAR=[[80,0],[190,1],[130,2],[240,3],[100,4],[220,0]];
+const DS_NEUT=[[70,52],[262,120],[182,86],[200,58],[122,120],[138,92],[232,154],[110,188]];
+const DS_MAC=[[84,56],[196,90],[136,124],[246,158],[96,190],[226,24]];
+const DS_STEM=[[60,28],[160,62],[260,96],[60,130],[160,164],[250,198]];
+class DomsScene{
+  constructor(host){this.host=host;this.t=0;
+    const fib=DS_FIB.map((y,i)=>`<g class="dfib"><rect class="mf" x="16" y="${y}" width="288" height="26" rx="13"/><line class="mf-str" x1="26" x2="294" y1="${y+13}" y2="${y+13}" stroke-width="16" stroke-dasharray="1.5 5"/></g>`).join('');
+    const tears=DS_TEAR.map(([x,i])=>`<rect class="mt" x="${x-3}" y="${DS_FIB[i]-1}" width="6" height="28" rx="2"/>`).join('');
+    const neut=DS_NEUT.map(([x,y])=>`<g class="dn"><circle cx="${x-3}" cy="${y-2}" r="4"/><circle cx="${x+3}" cy="${y-2}" r="4"/><circle cx="${x}" cy="${y+3}" r="4"/></g>`).join('');
+    const mac=DS_MAC.map(([x,y])=>`<g class="dm"><ellipse cx="${x+8}" cy="${y-4}" rx="6" ry="3" transform="rotate(-30 ${x+8} ${y-4})"/><ellipse cx="${x-8}" cy="${y+4}" rx="6" ry="3" transform="rotate(25 ${x-8} ${y+4})"/><circle cx="${x}" cy="${y}" r="9"/></g>`).join('');
+    const stem=DS_STEM.map(([x,y])=>`<ellipse class="ds" cx="${x}" cy="${y}" rx="9" ry="4.5"/>`).join('');
+    host.innerHTML=`<svg viewBox="0 0 320 236" role="img" aria-label="Muscle fibres with immune cells and muscle stem cells at the chosen time">
+      <text class="svg-small" x="304" y="18" text-anchor="end">Muscle fibres, close up</text>${fib}<g>${tears}</g><g class="dsn">${neut}</g><g class="dsm">${mac}</g><g class="dss">${stem}</g>
+      <g aria-hidden="true"><g class="dn"><circle cx="20" cy="222" r="4"/></g><text class="svg-small" x="28" y="226">neutrophil</text>
+      <circle style="fill:var(--warm)" cx="96" cy="222" r="5"/><text class="svg-small" x="104" y="226">clean-up</text>
+      <circle style="fill:var(--accent)" cx="160" cy="222" r="5"/><text class="svg-small" x="168" y="226">repair</text>
+      <ellipse class="ds" cx="220" cy="222" rx="7" ry="3.5" style="opacity:1"/><text class="svg-small" x="231" y="226">stem cell</text></g></svg>`;
+    const q=s=>[...host.querySelectorAll(s)];this.fibs=q('.dfib');this.tears=q('.mt');this.neut=q('.dsn .dn');this.mac=q('.dsm .dm');this.stem=q('.dss .ds');}
+  visible(){return this.host.offsetParent!==null;}
+  step(dt){this.t+=dt;const t=domsT,bob=(i,a)=>reduceMotion?'':`translate(${(a*Math.sin(this.t*1.2+i)).toFixed(1)} ${(a*Math.cos(this.t+i*2)).toFixed(1)})`;
+    const dmg=DOMS.dmg(t)/1.5;this.tears.forEach((e,i)=>e.setAttribute('opacity',(i<Math.round(dmg*6+0.2)?Math.min(1,dmg*1.4):0).toFixed(2)));
+    const nn=Math.round(DOMS.neut(t)*8),nm=Math.round(DOMS.mac(t)*6),sv=DOMS.stem(t);
+    this.neut.forEach((e,i)=>{e.setAttribute('opacity',i<nn?'1':'0');e.setAttribute('transform',bob(i,1.5));});
+    this.mac.forEach((e,i)=>{e.setAttribute('opacity',i<nm?'1':'0');e.classList.toggle('repair',t>=72);e.setAttribute('transform',bob(i+3,2));});
+    this.stem.forEach((e,i)=>e.setAttribute('opacity',(sv*(i<Math.round(sv*6+0.3)?1:0)).toFixed(2)));
+    const grow=3*smooth(96,120,t);this.fibs.forEach((g,i)=>{const r=g.firstElementChild,y=DS_FIB[i]-grow/2;r.setAttribute('y',y.toFixed(1));r.setAttribute('height',(26+grow).toFixed(1));});}
+}
+function renderDoms(){const t=domsT,st=domsStage(t),inp=domsInputs(t);
+  $('#d-time').value=t;$('#d-time-out').textContent=t<24?`${t} h`:`${t} h (day ${Math.floor(t/24)})`;
+  domsMeters.set(DOMS.dmg(t),DOMS.sore(t));
+  const gl=guardLevel({inflam:inp.inflam,damage:inp.damage});setPill('#d-guard',GUARD[gl],['','','part','louder'][gl]);
+  $('#d-now-title').textContent=`${st.when}: ${st.title}`;$('#d-now-text').textContent=st.text;
+  $$('#doms-stages .stage').forEach((b,i)=>b.setAttribute('aria-pressed',String(DOMS_STAGES[i]===st)));
+  renderDomsChart();}
+function buildDoms(){$('#doms-stages').innerHTML=DOMS_STAGES.map((st,i)=>`<button class="stage" data-stage="${i}" aria-pressed="false"><span class="when">${st.when}</span><strong>${st.title}</strong></button>`).join('');
+  $('#doms-stages').addEventListener('click',e=>{const b=e.target.closest('[data-stage]');if(!b)return;const st=DOMS_STAGES[+b.dataset.stage];domsT=st.title==='Peak soreness'?48:Math.round((st.a+st.b)/2);renderDoms();});
+  $('#d-time').addEventListener('input',e=>{domsT=+e.target.value;renderDoms();});
+  $('#d-to-body').addEventListener('click',()=>{const t=domsT,inp=domsInputs(t);applyPreset(state,'doms');Object.assign(state,inp);state.time=t/24;state.presetId=null;
+    state.storyOverride={name:`DOMS, ${t} h after the workout`,text:domsStage(t).title+'. Damage is '+(inp.damage<=1?'low':'moderate')+'; look at the immune cells in the ankle view.',doms:true};
+    setView('ankle');go('explore');refresh();});}
+
+/* ---------- Tendon 24-hour check ---------- */
+const TEN={B:(t,m)=>t<0?0:m*1.15*(t/10)*Math.exp(1-t/10),S:t=>t<0?0:0.8*(t/24)*Math.exp(1-t/24),
+  pain:(t,dose)=>{if(t<0)return 0;if(dose==='ok')return t<1?1-0.6*t:0.6*Math.exp(-(t-1)/6);
+    if(t<1)return 2-t;const x=(t-1)/21;return 5*Math.pow(x,1.6)*Math.exp(1.6*(1-x))+Math.exp(-(t-1)/3);}};
+const TEN_BASE=1;let tenDose='much',tenAgain=0,tenT=24;
+const tenSessions=()=>tenAgain?[0,tenAgain]:[0];
+const tenM=()=>tenDose==='much'?1.3:1;
+const tenStack=s=>s<36?1.35:s<60?1.1:1;
+function tenPain(t,only1){let p=TEN_BASE;(only1?[0]:tenSessions()).forEach((s,i)=>{p+=(i&&tenDose==='much'?tenStack(s):1)*TEN.pain(t-s,tenDose);});return Math.min(10,p);}
+const tenB=t=>tenSessions().reduce((a,s)=>a+TEN.B(t-s,tenM()),0);
+const tenS=t=>tenSessions().reduce((a,s)=>a+TEN.S(t-s),0);
+function tenCum(t,only1){let c=0;const ss=only1?[0]:tenSessions();for(let x=0.5;x<=t;x+=0.5)c+=ss.reduce((a,s)=>a+TEN.S(x-s)-TEN.B(x-s,tenM()),0)*0.5;return c;}
+const TEN_PHASES=[{a:0,b:1,title:'During the session',text:'Tendon pain often eases as you warm up. Feeling fine right now does not tell you much yet.'},
+  {a:1,b:12,title:'After the session',text:'Breakdown is running ahead of building. A sensitive tendon may start to grumble later in the day.'},
+  {a:12,b:30,title:'Next morning: the check that matters',text:'Compare pain and stiffness with your usual morning. Worse than usual means the dose was too much.'},
+  {a:30,b:72,title:'Building phase',text:'Building now outpaces breakdown. This is when the tendon adapts and gets stronger.'},
+  {a:72,b:999,title:'Ready again',text:'Building has had time to catch up. A good time for the next heavy or springy session.'}];
+function tenPhase(t){const ss=tenSessions().filter(s=>s<=t),last=ss[ss.length-1],dt=t-last;return TEN_PHASES.find(p=>dt>=p.a&&dt<p.b)||TEN_PHASES[TEN_PHASES.length-1];}
+function tenChecks(){let during=0,after=0;for(let t=0;t<=1;t+=0.1)during=Math.max(during,tenPain(t,true));for(let t=1;t<=12;t+=0.5)after=Math.max(after,tenPain(t,true));
+  const morning=tenPain(22,true),dm=morning-TEN_BASE;
+  const c1=during<=5?'g':'r',c2=after<=5?'g':'a',c3=dm<=1?'g':dm<=2?'a':'r';
+  return {during,after,morning,dm,c:[c1,c2,c3],verdict:[c1,c2,c3].includes('r')?'r':[c1,c2,c3].includes('a')?'a':'g'};}
+function renderTenChart(){const svg=$('#ten-chart');const W=680,L=52,R=118,pw=W-L-R,X=t=>L+t/120*pw;
+  const pT=36,pH=150,Yp=v=>pT+pH-(v/10)*pH; const cT=246,cH=150,cMax=2,Yc=v=>cT+cH/2-(v/cMax)*(cH/2);
+  const ts=[];for(let i=0;i<=240;i++)ts.push(i/2);
+  const path=(f,Y)=>'M'+ts.map(t=>X(t).toFixed(1)+' '+Y(f(t)).toFixed(1)).join('L');
+  const areaUp=f=>path(f,Yc)+`L${X(120).toFixed(1)} ${Yc(0).toFixed(1)}L${X(0)} ${Yc(0).toFixed(1)}Z`;
+  const ticks=[0,24,48,72,96,120].map(t=>`<line class="peaks-grid" x1="${X(t)}" x2="${X(t)}" y1="${pT}" y2="${cT+cH}"/><text class="svg-small" x="${X(t)}" y="${cT+cH+18}" text-anchor="middle">${t} h</text>`).join('');
+  const morn=tenSessions().map(s=>s+20<=120?`<rect class="ten-morn" x="${X(s+18).toFixed(1)}" y="${pT}" width="${(X(s+28)-X(s+18)).toFixed(1)}" height="${pH}"/><text class="svg-small" x="${X(s+23).toFixed(1)}" y="${pT+12}" text-anchor="middle">next morning</text>`:'').join('');
+  const sess=tenSessions().map((s,i)=>`<line class="ten-sess" x1="${X(s).toFixed(1)}" x2="${X(s).toFixed(1)}" y1="${pT}" y2="${cT+cH}"/><text class="svg-small" x="${(X(s)+5).toFixed(1)}" y="${pT+12}" font-weight="700">Session ${i+1}</text>`).join('');
+  const yp=[0,5,10].map(v=>`<text class="svg-small" x="${L-8}" y="${Yp(v)+4}" text-anchor="end">${v}</text>`).join('');
+  const cumScale=12,xn=X(tenT);
+  svg.innerHTML=`${morn}${ticks}${yp}
+   <line class="ten-five" x1="${L}" x2="${L+pw}" y1="${Yp(5)}" y2="${Yp(5)}"/><text class="svg-small" x="${L+pw+6}" y="${Yp(5)+4}">5/10 limit</text>
+   <text class="svg-sub" x="${L-40}" y="${pT-14}">Tendon pain (0–10)</text>
+   <path class="dc-sore" d="${path(t=>tenPain(t),Yp)}"/>
+   <line class="peaks-axis" x1="${L}" x2="${L}" y1="${pT}" y2="${pT+pH}"/><line class="peaks-axis" x1="${L}" x2="${L+pw}" y1="${pT+pH}" y2="${pT+pH}"/>
+   <text class="svg-sub" x="${L-40}" y="${cT-12}">Collagen turnover in the tendon</text>
+   <path class="ten-build" d="${areaUp(tenS)}"/><path class="ten-break" d="${areaUp(t=>-tenB(t))}"/>
+   <line class="peaks-axis" x1="${L}" x2="${L+pw}" y1="${Yc(0)}" y2="${Yc(0)}"/><line class="peaks-axis" x1="${L}" x2="${L}" y1="${cT}" y2="${cT+cH}"/>
+   <path class="ten-net" d="${path(t=>tenS(t)-tenB(t),Yc)}"/>
+   <path class="ten-cum" d="${path(t=>Math.max(-cMax,Math.min(cMax,tenCum(t)/cumScale)),Yc)}"/>
+   <text class="svg-small" x="${L-8}" y="${Yc(1.3)+4}" text-anchor="end">build</text><text class="svg-small" x="${L-8}" y="${Yc(-1.3)+4}" text-anchor="end">break</text>
+   ${sess}
+   <line class="peaks-now" x1="${xn.toFixed(1)}" x2="${xn.toFixed(1)}" y1="${pT}" y2="${pT+pH}"/><line class="peaks-now" x1="${xn.toFixed(1)}" x2="${xn.toFixed(1)}" y1="${cT}" y2="${cT+cH}"/>
+   <circle style="fill:var(--pain)" cx="${xn.toFixed(1)}" cy="${Yp(tenPain(tenT)).toFixed(1)}" r="5"/>
+   <circle style="fill:var(--ink)" cx="${xn.toFixed(1)}" cy="${Yc(tenS(tenT)-tenB(tenT)).toFixed(1)}" r="4.5"/>
+   <text class="svg-label" style="fill:var(--pain);font-size:13px" x="${L+pw+6}" y="${Yp(tenPain(120))-4}">Tendon pain</text>
+   <text class="svg-label" style="font-size:13px" x="${L+pw+6}" y="${Yc(0)-6}">Net balance</text>
+   <text class="svg-small" x="${L+pw+6}" y="${cT+14}">building ↑</text><text class="svg-small" x="${L+pw+6}" y="${cT+cH-4}">breakdown ↓</text>
+   <text class="svg-sub" x="${(L+pw/2).toFixed(1)}" y="${cT+cH+38}" text-anchor="middle">Hours after the first session</text>`;}
+function renderTendon(){const t=tenT;$('#t-time').value=t;$('#t-time-out').textContent=t<24?`${t} h`:`${t} h (day ${Math.floor(t/24)+1})`;
+  $$('#ten-dose [data-dose]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.dose===tenDose)));
+  $$('#ten-again [data-again]').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.again===tenAgain)));
+  $('#t-pain').textContent=tenPain(t).toFixed(1).replace('.0','');
+  const net=tenS(t)-tenB(t),cum=tenCum(t);
+  setPill('#t-now',t===0?'Resting':net<0?'Breaking down':'Building',net<0?'louder':'quieter');
+  setPill('#t-bal',cum<0?'Behind':'Caught up',cum<0?'part':'quieter');
+  const ph=tenPhase(t);$('#t-phase-title').textContent=ph.title;$('#t-phase-text').textContent=ph.text;
+  const ck=tenChecks(),dot=c=>`<span class="tl tl-${c}"></span>`,f=v=>v.toFixed(1).replace('.0','');
+  $('#pmm-during').innerHTML=`${dot(ck.c[0])}<span><strong>During:</strong> pain peaks at ${f(ck.during)}/10 ${ck.during<=5?'(below 5, fine)':'(above 5)'}</span>`;
+  $('#pmm-after').innerHTML=`${dot(ck.c[1])}<span><strong>After:</strong> up to ${f(ck.after)}/10 ${ck.after<=5?'(allowed if settled by morning)':'(too high)'}</span>`;
+  $('#pmm-morning').innerHTML=`${dot(ck.c[2])}<span><strong>Next morning:</strong> ${f(ck.morning)}/10 vs usual ${TEN_BASE}/10 ${ck.dm<=1?'(settled)':ck.dm<=2?'(a little worse)':'(worse and stiffer than usual)'}</span>`;
+  const V={g:['Keep going','This dose suits the tendon right now. Repeat it, then progress slowly.'],a:['Modify','Keep loading, but hold the dose steady before progressing.'],r:['Ease off','The next-morning check says the dose was too much. Lower the load next session, then build again.']}[ck.verdict];
+  $('#pmm-verdict').className='pmm-verdict tl-bg-'+ck.verdict;$('#pmm-verdict').innerHTML=`<strong>${V[0]}</strong> ${V[1]}`;
+  let msg;if(!tenAgain)msg='One session: pick when the next heavy or springy session happens to see whether building has caught up first.';
+  else{const c=tenCum(tenAgain,true);msg=c>=0?`Loading again at ${tenAgain} h: building has already repaid the breakdown, so the next session starts ahead.`:`Loading again at ${tenAgain} h: the tendon is still behind, so breakdown from the next session stacks on top${tenDose==='much'?' and next-morning pain stacks too':''}.`;}
+  const cc=$('#ten-catch');cc.textContent=msg;cc.className='ten-catch '+(tenAgain?(tenCum(tenAgain,true)>=0?'ok':'behind'):'');
+  renderTenChart();}
+function buildTendon(){$('#ten-dose').addEventListener('click',e=>{const b=e.target.closest('[data-dose]');if(b){tenDose=b.dataset.dose;renderTendon();}});
+  $('#ten-again').addEventListener('click',e=>{const b=e.target.closest('[data-again]');if(b){tenAgain=+b.dataset.again;renderTendon();}});
+  $('#t-time').addEventListener('input',e=>{tenT=+e.target.value;renderTendon();});}
+
+let healMode='injury';
+function setHealMode(m){healMode=m;$('#heal-injury').hidden=m!=='injury';$('#heal-doms').hidden=m!=='doms';$('#heal-tendon').hidden=m!=='tendon';
+  $$('#heal-mode [data-hm]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.hm===m)));if(m==='doms')renderDoms();if(m==='tendon')renderTendon();}
+
 /* ---------- Routing ---------- */
 const VIEWS=['start','explore','compare','healing','my-plan'];
-function route(){let v=(location.hash||'').slice(1);if(!VIEWS.includes(v))v='start';
+function route(){let v=(location.hash||'').slice(1);if(v==='doms'||v==='tendon'){setHealMode(v);v='healing';}if(!VIEWS.includes(v))v='start';
   VIEWS.forEach(n=>$('#view-'+n).hidden=n!==v);requestAnimationFrame(fitExplore);
   $$('.nav a').forEach(a=>{if(a.dataset.view===v)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
   refresh();}
@@ -1347,8 +1683,8 @@ function go(v){if(location.hash!=='#'+v)location.hash=v;else route();}
 
 /* ---------- Figure views ---------- */
 const HINTS={body:'Tap the ankle to send a signal. Filled dots are danger, hollow dots are touch. Blue and orange dots coming down are the brake and the accelerator.',
-  ankle:'Immune cells gather at an injury and release chemicals. The more there are, the more awake the guard dog, and the more easily the sensor fires.',
-  gate:'Danger and touch signals arrive from the left. The brain’s brake (blue) and accelerator (orange) arrive from the right. When the fire alarm cells are active, touch can pass the gate as danger.'};
+  ankle:'Neutrophils and mast cells arrive first. Over the next few days macrophages take over, clean up and start repair. When the sensor fires hard, the nerve releases its own messengers (pink dots) that call in more immune cells: the nerve and immune system talk both ways.',
+  gate:'Danger and touch signals arrive from the left; the brain’s brake (blue) and accelerator (orange) arrive from the right. Astrocytes and microglia normally look after the gate. When they are activated, they act as a fire alarm and touch can pass the gate as danger.'};
 function setView(v){$('#body-scene').hidden=v!=='body';$('#ankle-scene').hidden=v!=='ankle';$('#zoom-scene').hidden=v!=='gate';
   [['#v-body','body'],['#v-ankle','ankle'],['#v-gate','gate']].forEach(([sel,k])=>$(sel).setAttribute('aria-pressed',String(k===v)));
   $('#figure-hint').textContent=HINTS[v];}
@@ -1361,7 +1697,7 @@ const TOUR=[
   {view:'explore',preset:'sprain1',fig:'body',hl:'cord',title:'A strong signal gets through',text:'A sprained ankle sends loud signals. They pass the gate and travel up the spinal cord to the brain.'},
   {view:'explore',preset:'sprain1',fig:'body',hl:'brain',title:'Threat or no threat?',text:'The brain weighs the signal against everything else it knows: past experience, beliefs, stress, what you see and hear. Pain is its decision to protect you.'},
   {view:'explore',preset:'sprainworst',fig:'body',hl:'dial',title:'The brake and the accelerator',text:'The brain works the gate with a brake and an accelerator. Feeling safe applies the brake. Worry and stress press the accelerator. Watch the two bars under the dial.'},
-  {view:'explore',preset:'touch',fig:'gate',hl:'alarm',title:'When touch starts to hurt',text:'In persistent pain, microglia and astrocytes at the gate can stay switched on. The gate starts reading touch and movement as danger, so a sock or a bedsheet can hurt with no damage.'},
+  {view:'explore',preset:'touch',fig:'gate',hl:'alarm',title:'When touch starts to hurt',text:'Microglia and astrocytes normally look after the gate. In persistent pain they can switch from caretakers to a fire alarm. The gate starts reading touch and movement as danger, so a sock or a bedsheet can hurt with no damage.'},
   {view:'compare',pair:['sprain1','midgame'],title:'Same damage, different pain',text:'Both people have real damage at the ankle. Compare their pain. Feeling safe and focused elsewhere puts the brake on.'},
   {view:'my-plan',title:'Your dials',text:'Many of these dials are ones you can turn. Press Do 10 minutes of exercise and watch the brake get stronger.'}
 ];
@@ -1392,6 +1728,9 @@ const zoomScene=new ZoomScene($('#zoom-scene'),()=>state);scenes.push(zoomScene)
 const ankleScene=new AnkleScene($('#ankle-scene'),()=>state);scenes.push(ankleScene);
 buildCompare();
 setView('body');
+const domsMeters=makeMeters($('#doms-meters'),true);buildDoms();buildTendon();
+const domsScene=new DomsScene($('#doms-scene'));scenes.push(domsScene);
+$('#heal-mode').addEventListener('click',e=>{const b=e.target.closest('[data-hm]');if(b)setHealMode(b.dataset.hm);});
 
 $('#v-body').addEventListener('click',()=>setView('body'));
 $('#v-ankle').addEventListener('click',()=>setView('ankle'));
