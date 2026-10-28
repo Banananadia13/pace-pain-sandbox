@@ -92,21 +92,21 @@ textarea{width:100%;min-height:64px;padding:10px 12px;border-radius:12px;border:
 .presets{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
 .story{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline}
 .story strong{font-family:var(--f-display);font-size:18px}
-.explore{display:grid;grid-template-columns:290px minmax(0,1fr) 300px;grid-template-areas:"controls body read";gap:18px;align-items:start}
-.controls{grid-area:controls;display:grid;gap:16px}
+.explore{display:grid;grid-template-columns:336px minmax(0,1fr) 300px;grid-template-areas:"controls body read";gap:18px;align-items:start}
+.controls{grid-area:controls;min-width:0}
 .bodypanel{grid-area:body;display:flex;flex-direction:column;gap:10px}
 .readout{grid-area:read;display:grid;gap:14px}
-.group{display:grid;gap:14px}
+.group{display:grid;gap:6px}
 .group-head{display:flex;align-items:center;gap:8px}
-.group-head .dot{width:10px;height:10px;border-radius:50%}
-.group-head h3{font-size:16px}
-.ctl{display:grid;gap:4px}
+.group-head .dot{width:8px;height:8px;border-radius:50%}
+.group-head h3{font-size:12px;font-family:var(--f-mono);font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.ctl{display:grid;gap:0}
 .ctl-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
-.ctl-top label{font-weight:700;font-size:15px}
-.ctl-top output{font-family:var(--f-mono);font-size:14px;color:var(--muted)}
+.ctl-top label{font-weight:700;font-size:14px;line-height:1.3}
+.ctl-top output{font-family:var(--f-mono);font-size:13px;color:var(--muted)}
 .ctl .sub{font-size:13px;color:var(--muted);line-height:1.35}
-.ends{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
-input[type=range]{width:100%;accent-color:var(--accent);min-height:30px;cursor:pointer}
+.ends{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:-4px}
+input[type=range]{width:100%;accent-color:var(--accent);height:24px;margin:2px 0;cursor:pointer}
 .bodytools{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center}
 .figure-host svg{display:block;width:100%;height:auto;max-width:520px;margin:0 auto}
 .hint{font-size:13px;color:var(--muted);text-align:center}
@@ -331,20 +331,98 @@ details.answer summary{cursor:pointer;font-weight:700;color:var(--accent);min-he
 @media (max-width:720px){.chem-grid{grid-template-columns:1fr}}
 @media (prefers-reduced-motion: reduce){.g-needle{transition:none}}
 
+
+/* compact controls */
+.ctl-panel{display:grid;gap:12px;padding:14px 16px}
+.ctl-panel .group + .group{border-top:1px solid var(--line);padding-top:10px}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.ctl-hint{grid-column:1/-1;font-size:13px;line-height:1.4;color:var(--muted);background:var(--surface-2);border-radius:10px;padding:8px 10px;min-height:52px}
+.ctl-hint strong{color:var(--ink)}
+.quick{grid-column:1/-1}
+.quick summary{cursor:pointer;font-weight:700;font-size:14px;min-height:32px;display:flex;align-items:center;gap:8px}
+.quick .chips{gap:6px;margin-top:6px}
+.quick .chip{min-height:32px;padding:4px 10px;font-size:13px}
+.q-count{font-family:var(--f-mono);font-size:11px;font-weight:500;padding:1px 7px;border-radius:999px;background:var(--accent);color:var(--accent-ink)}
+.q-count:empty{display:none}
+.q-all{display:inline-block;margin-top:8px;color:var(--accent);font-weight:700;font-size:13px}
+
+
+/* one-row controls */
+.ctl-panel .ctl{grid-template-columns:136px minmax(0,1fr) 42px;grid-template-areas:"label slider value" ". ends .";align-items:center;column-gap:8px;min-height:30px}
+.ctl-panel .ctl-top{display:contents}
+.ctl-panel .ctl label{grid-area:label;font-size:13px;line-height:1.2}
+.ctl-panel .ctl output{grid-area:value;text-align:right;font-size:12px;white-space:nowrap}
+.ctl-panel .ctl input[type=range]{grid-area:slider;height:22px;margin:0}
+.ctl-panel .ends{grid-area:ends;margin-top:-6px;font-size:10.5px}
+.ctl-panel .group{gap:2px}
+.ctl-panel{gap:10px}
+.ctl-hint{min-height:0;padding:7px 10px;font-size:12.5px}
+.presets .chip{min-height:34px;padding:5px 12px}
+.presets{gap:8px;margin-bottom:12px}
+
+
+/* fit Explore to the window */
+.readout .facts{gap:5px}
+.readout .fact{font-size:14px}
+.readout .pill{font-size:12px;padding:2px 8px}
+.why{font-size:15px;line-height:1.4;padding:10px 12px}
+.meter-panel{display:grid;gap:12px}
+.meter-num{font-size:34px}
+.gauge-row{display:grid;grid-template-columns:118px minmax(0,1fr);gap:12px;align-items:center;border-top:1px solid var(--line);padding-top:10px;margin-top:4px}
+.gauge-row svg{display:block;width:100%;margin:0}
+.gauge-row .g-read{justify-content:flex-start;font-size:17px;margin-top:2px}
+.g-text{font-size:13px;line-height:1.35;color:var(--muted);margin-top:2px}
+.g-note{text-align:left;margin-top:0}
+.bodypanel .hint{font-size:12.5px;line-height:1.4}
+@media (min-width:1181px) and (min-height:600px){
+  .bodypanel,.readout{height:var(--fit-h,auto)}
+  .bodypanel .figure-host{flex:1 1 0;min-height:0}
+  .bodypanel .figure-host svg{width:100%;height:100%;max-width:none}
+  .readout{display:flex;flex-direction:column;gap:10px}
+  .meter-panel{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:10px}
+  .meter-panel .meters{flex:1 1 auto;min-height:0}
+  .meter-panel .meter{display:flex;flex-direction:column;align-items:center;gap:4px;min-height:0}
+  .meter-panel .meter-track{flex:1 1 auto;height:auto;min-height:60px}
+  .readout .facts{flex:none}
+}
+
+
+.bodypanel .why{font-size:14.5px;padding:8px 12px;display:flex;gap:10px;align-items:baseline}
+.bodypanel .why .eyebrow{display:inline;margin:0;flex:none}
+@media (min-width:1181px) and (min-height:600px){
+  .meter-panel .meters{min-height:120px}
+  .meter-panel{padding-block:16px}
+}
+
+
+@media (min-width:1181px) and (max-height:860px){
+  .top{padding-block:12px 10px}
+  .brand h1{font-size:26px}
+  .brand .eyebrow{display:none}
+  .nav a{min-height:38px;padding:7px 12px}
+  .view{padding-block:12px 8px}
+  .presets{margin-bottom:10px;gap:6px}
+  .presets .chip{min-height:30px;padding:3px 11px;font-size:13px}
+  .story strong{font-size:16px}
+  .story span{font-size:14px}
+  .bodytools .seg button{min-height:34px;padding:4px 12px}
+  .bodytools .btn.small{min-height:34px;padding:4px 10px}
+}
+
 /* Responsive */
 @media (max-width:1180px){
   .explore{grid-template-columns:minmax(0,1fr) 300px;grid-template-areas:"body read" "controls controls"}
-  .controls{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .ctl-panel{grid-template-columns:repeat(3,minmax(0,1fr));column-gap:24px}
 }
 @media (max-width:900px){
   .start,.healing,.plan{grid-template-columns:minmax(0,1fr)}
   .plan-side{position:static}
-  .controls{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .ctl-panel{grid-template-columns:repeat(2,minmax(0,1fr))}
   .tables{grid-template-columns:1fr}
 }
 @media (max-width:720px){
   .explore{grid-template-columns:minmax(0,1fr);grid-template-areas:"body" "read" "controls"}
-  .controls{grid-template-columns:minmax(0,1fr)}
+  .ctl-panel{grid-template-columns:minmax(0,1fr)}
   .compare{grid-template-columns:1fr}
   .cat{grid-template-columns:minmax(0,1fr)}
   .meter-track{height:150px}
@@ -422,25 +500,25 @@ details.answer summary{cursor:pointer;font-weight:700;color:var(--accent);min-he
         <div class="bodytools">
           <div class="seg" role="group" aria-label="View">
             <button id="v-body" aria-pressed="true">Whole body</button>
-            <button id="v-ankle" aria-pressed="false">Zoom: ankle</button>
-            <button id="v-gate" aria-pressed="false">Zoom: gate</button>
+            <button id="v-ankle" aria-pressed="false" aria-label="Zoom into the ankle">Ankle</button>
+            <button id="v-gate" aria-pressed="false" aria-label="Zoom into the gate">Gate</button>
           </div>
           <div class="tools-right">
             <button class="btn small" id="poke">Send a signal</button>
-            <button class="btn small" data-exercise>Exercise 10 min</button>
+            <button class="btn small" data-exercise aria-label="Do 10 minutes of exercise">Exercise</button>
             <button class="btn small" id="reset">Reset</button>
           </div>
         </div>
         <div class="figure-host" id="body-scene"></div>
         <div class="figure-host" id="ankle-scene" hidden></div>
         <div class="figure-host" id="zoom-scene" hidden></div>
+        <div class="why" aria-live="polite"><span class="eyebrow">Why?</span><span id="why"></span></div>
         <p class="hint" id="figure-hint">Tap the ankle to send a signal. Small signals fade at the gate; strong ones travel up to the brain.</p>
       </div>
       <aside class="readout">
-        <div class="panel">
+        <div class="panel meter-panel">
           <div class="meters" id="explore-meters"></div>
         </div>
-        <div class="why" aria-live="polite"><span class="eyebrow">Why?</span><span id="why"></span></div>
         <div class="panel facts">
           <div class="fact"><span>Guard dog at the ankle</span><span class="pill" id="f-guard"></span></div>
           <div class="fact"><span>The gate</span><span class="pill" id="f-gate"></span></div>
@@ -449,13 +527,15 @@ details.answer summary{cursor:pointer;font-weight:700;color:var(--accent);min-he
           <div class="fact"><span>Brake from the brain</span><span class="pill" id="f-brake"></span></div>
           <div class="fact"><span>Accelerator</span><span class="pill" id="f-accel"></span></div>
           <div class="fact" id="f-ex-row" hidden><span>Exercise effect</span><span class="pill quieter" id="f-ex"></span></div>
-        </div>
-        <div class="panel gauge">
-          <h3>Protection level</h3>
-          <svg id="gauge" viewBox="0 0 240 124" role="img" aria-label="Protection level gauge"></svg>
-          <div class="g-read"><span class="g-sw" id="g-sw"></span><strong id="g-name"></strong></div>
-          <p class="muted" id="g-text" style="font-size:14px"></p>
-          <p class="tiny">Styled on Australia’s fire danger ratings.</p>
+          <div class="gauge-row">
+            <svg id="gauge" viewBox="0 0 240 124" role="img" aria-label="Protection level gauge"></svg>
+            <div>
+              <span class="eyebrow">Protection level</span>
+              <div class="g-read"><span class="g-sw" id="g-sw"></span><strong id="g-name"></strong></div>
+              <p class="g-text" id="g-text"></p>
+            </div>
+          </div>
+          <p class="tiny g-note">Styled on Australia’s fire danger ratings.</p>
         </div>
       </aside>
     </div>
@@ -854,7 +934,7 @@ class BodyScene{
   }
   visible(){return this.host.offsetParent!==null;}
   highlight(part){this.el.rings.forEach(r=>r.classList.toggle('on',r.dataset.part===part));}
-  dot(cls,r){const c=document.createElementNS(SVGNS,'circle');c.setAttribute('class',cls);c.setAttribute('r',r.toFixed(2));this.layer.appendChild(c);return c;}
+  dot(cls,r){const c=document.createElementNS(SVGNS,'circle');c.setAttribute('class',cls);c.setAttribute('r',r.toFixed(2));c.setAttribute('cx','-100');c.setAttribute('cy','-100');this.layer.appendChild(c);return c;}
   spawnSensor(amp){const r=2.4+2.2*Math.pow(Math.min(amp,3),.7);this.pulses.push({k:'pns',amp,c:this.dot('pulse-s',r),t:0,speed:300,r});}
   spawnTouch(){this.pulses.push({k:'pns',touch:true,c:this.dot('pulse-t',3),t:0,speed:340,r:3});}
   poke(){const m=painModel(this.getState());if(reduceMotion){this.flash=Math.min(1,this.flash+0.4);return;}
@@ -953,7 +1033,7 @@ class ZoomScene{
       const [cx,cy]=centres[i%3];this.cytos.push({c,cx,cy,a:Math.random()*6.28,rad:30+Math.random()*22,sp:0.3+Math.random()*0.5});}}
   visible(){return this.host.offsetParent!==null;}
   highlight(part){this.rings.forEach(r=>r.classList.toggle('on',r.dataset.part===part));}
-  dot(cls,r){const c=document.createElementNS(SVGNS,'circle');c.setAttribute('class',cls);c.setAttribute('r',r.toFixed(2));this.layer.appendChild(c);return c;}
+  dot(cls,r){const c=document.createElementNS(SVGNS,'circle');c.setAttribute('class',cls);c.setAttribute('r',r.toFixed(2));c.setAttribute('cx','-100');c.setAttribute('cy','-100');this.layer.appendChild(c);return c;}
   nt(cls,x0,y0,x1,y1,life,r=3){const c=this.dot(cls,r);c.setAttribute('cx',x0);c.setAttribute('cy',y0);return {k:'nt',c,x0,y0,x1,y1,life,t:0};}
   poke(){const m=painModel(this.getState());if(reduceMotion)return;for(let i=0;i<5;i++)setTimeout(()=>this.items.push({k:'in',amp:(m.N*m.S+1.1)*(0.75+0.5*Math.random()),t:0,speed:220,c:this.dot('pulse-s',6)}),i*110);}
   step(dt){const s=this.getState(),m=painModel(s);this.t+=dt;
@@ -1032,7 +1112,7 @@ class AnkleScene{
       const a=Math.random()*6.28,r=20+Math.random()*90;this.chems.push({c,x:clamp(150+r*Math.cos(a),24,296),y:clamp(170+r*0.9*Math.sin(a),50,310),ph:Math.random()*6.28});}}
   visible(){return this.host.offsetParent!==null;}
   highlight(part){this.rings.forEach(r=>r.classList.toggle('on',r.dataset.part===part));}
-  dot(cls,r){const c=document.createElementNS(SVGNS,'circle');c.setAttribute('class',cls);c.setAttribute('r',r.toFixed(2));this.layer.appendChild(c);return c;}
+  dot(cls,r){const c=document.createElementNS(SVGNS,'circle');c.setAttribute('class',cls);c.setAttribute('r',r.toFixed(2));c.setAttribute('cx','-100');c.setAttribute('cy','-100');this.layer.appendChild(c);return c;}
   spawn(amp){const i=Math.floor(Math.random()*AK_BR.length);this.items.push({k:'br',i,amp,t:0,speed:150,c:this.dot('pulse-s',3+2.2*Math.pow(Math.min(amp,3),.7))});}
   poke(){if(reduceMotion)return;const m=painModel(this.getState());for(let i=0;i<5;i++)setTimeout(()=>this.spawn((m.N*m.S+1.1)*(0.75+0.5*Math.random())),i*110);}
   step(dt){const s=this.getState(),m=painModel(s);this.t+=dt;
@@ -1120,17 +1200,22 @@ const CONTROLS=[
     {k:'time',label:'Time since injury',sub:'Follows the healing curve for a ligament',time:true}]},
   {group:'Brain',color:'var(--cns)',items:[
     {k:'worst',label:'Worst-case thinking',sub:'Also called catastrophising',step:0.5},
-    {k:'stress',label:'Stress and poor sleep',step:0.5},
-    {k:'understanding',label:'Understanding of pain',step:0.5},
-    {k:'focus',label:'Attention',ends:['Absorbed elsewhere','Focused on pain'],step:0.5}],chips:true}
+    {k:'stress',label:'Stress, poor sleep',sub:'Worry, tension and broken sleep',step:0.5},
+    {k:'understanding',label:'Understanding pain',sub:'How well you understand what pain is and why it happens',step:0.5},
+    {k:'focus',label:'Attention on pain',sub:'0 means absorbed in something else; 10 means watching the pain closely',step:0.5}],chips:true}
 ];
 function buildControls(){const host=$('#controls');
-  host.innerHTML=CONTROLS.map(g=>`<div class="panel group"><div class="group-head"><span class="dot" style="background:${g.color}"></span><h3>${g.group}</h3></div>
-    ${g.items.map(it=>it.time?`<div class="ctl"><div class="ctl-top"><label for="c-time">${it.label}</label><output id="o-time" class="num"></output></div><input type="range" id="c-time" min="0" max="1000" step="1"><span class="sub" id="c-time-sub">${it.sub}</span></div>`:
-      `<div class="ctl"><div class="ctl-top"><label for="c-${it.k}">${it.label}</label><output id="o-${it.k}" class="num"></output></div><input type="range" id="c-${it.k}" min="0" max="10" step="${it.step}">${it.ends?`<div class="ends"><span>${it.ends[0]}</span><span>${it.ends[1]}</span></div>`:''}${it.sub?`<span class="sub">${it.sub}</span>`:''}</div>`).join('')}
-    ${g.chips?`<div class="ctl"><span class="ctl-top"><span style="font-weight:700;font-size:15px">Add DIMs and SIMs</span></span><div class="chips" id="quick-chips"></div><a href="#my-plan" class="sub" style="color:var(--accent);font-weight:700">See all DIMs and SIMs</a></div>`:''}</div>`).join('');
+  const row=it=>it.time?`<div class="ctl" data-hint="${it.label}"><div class="ctl-top"><label for="c-time">${it.label}</label><output id="o-time" class="num"></output></div><input type="range" id="c-time" min="0" max="1000" step="1" aria-describedby="c-time-sub"><span class="vh" id="c-time-sub">${it.sub}</span></div>`:
+    `<div class="ctl" data-hint="${it.label}"><div class="ctl-top"><label for="c-${it.k}">${it.label}</label><output id="o-${it.k}" class="num"></output></div><input type="range" id="c-${it.k}" min="0" max="10" step="${it.step}"${it.sub?` aria-describedby="d-${it.k}"`:''}>${it.ends?`<div class="ends"><span>${it.ends[0]}</span><span>${it.ends[1]}</span></div>`:''}${it.sub?`<span class="vh" id="d-${it.k}">${it.sub}</span>`:''}</div>`;
+  host.innerHTML=`<div class="panel ctl-panel">${CONTROLS.map(g=>`<div class="group"><div class="group-head"><span class="dot" style="background:${g.color}"></span><h3>${g.group}</h3></div>${g.items.map(row).join('')}</div>`).join('')}
+    <p class="ctl-hint" id="ctl-hint" aria-live="polite">Drag a slider to see what it means.</p>
+    <details class="quick"><summary>Add DIMs and SIMs <span class="q-count" id="quick-count"></span></summary><div class="chips" id="quick-chips"></div><a href="#my-plan" class="sub q-all">See all DIMs and SIMs</a></details></div>`;
   CONTROLS.forEach(g=>g.items.forEach(it=>{if(it.time)return;$(`#c-${it.k}`).addEventListener('input',e=>{state[it.k]=+e.target.value;state.presetId=null;refresh();});}));
   $('#c-time').addEventListener('input',e=>setTime(+e.target.value/1000*timeMax(),true));
+  const showHint=el=>{const c=el.closest('.ctl');if(!c)return;const d=c.querySelector('.vh');$('#ctl-hint').innerHTML=`<strong>${c.dataset.hint}:</strong> ${d?d.textContent:''}`;};
+  host.addEventListener('focusin',e=>{if(e.target.matches('input[type=range]'))showHint(e.target);});
+  host.addEventListener('pointerdown',e=>{if(e.target.closest('.ctl'))showHint(e.target);});
+  host.addEventListener('input',e=>{if(e.target.matches('input[type=range]'))showHint(e.target);});
   $('#quick-chips').innerHTML=QUICK.map(chipHTML).join('');
 }
 function chipHTML(id){const L=LABELS[id];const tag=L.cat==='dial'?'':`<span class="tag">${L.type==='dim'?'DIM':'SIM'}</span>`;return `<button class="chip ${L.type}${L.chem?' has-chem':''}" data-chip="${id}" aria-pressed="false">${tag}${L.label}${L.chem?`<span class="chem">${L.chem}</span>`:''}</button>`;}
@@ -1154,6 +1239,7 @@ function refresh(){const m=painModel(state);
   $('#c-time-sub').textContent=`Follows the healing curve for: ${TISSUES[state.tissue].label.toLowerCase()}`;
   $('#h-phase').textContent=phaseAt(state.time);
   $$('[data-chip]').forEach(b=>{const id=b.dataset.chip;b.setAttribute('aria-pressed',state.dims.has(id)||state.sims.has(id)?'true':'false');});
+  {const n=QUICK.filter(id=>state.dims.has(id)||state.sims.has(id)).length;$('#quick-count').textContent=n?`${n} on`:'';}
   $$('[data-preset]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.preset===state.presetId?'true':'false'));
   const p=presetById(state.presetId);
   $('#story-name').textContent=p?p.name:'Your own scenario';
@@ -1254,13 +1340,13 @@ function syncQ(){$$('[data-q1]').forEach(b=>b.setAttribute('aria-pressed',b.data
 /* ---------- Routing ---------- */
 const VIEWS=['start','explore','compare','healing','my-plan'];
 function route(){let v=(location.hash||'').slice(1);if(!VIEWS.includes(v))v='start';
-  VIEWS.forEach(n=>$('#view-'+n).hidden=n!==v);
+  VIEWS.forEach(n=>$('#view-'+n).hidden=n!==v);requestAnimationFrame(fitExplore);
   $$('.nav a').forEach(a=>{if(a.dataset.view===v)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
   refresh();}
 function go(v){if(location.hash!=='#'+v)location.hash=v;else route();}
 
 /* ---------- Figure views ---------- */
-const HINTS={body:'Tap the ankle to send a signal. Filled dots are danger signals; hollow dots are touch. Small signals fade at the gate. Blue and orange dots coming down are the brake and the accelerator.',
+const HINTS={body:'Tap the ankle to send a signal. Filled dots are danger, hollow dots are touch. Blue and orange dots coming down are the brake and the accelerator.',
   ankle:'Immune cells gather at an injury and release chemicals. The more there are, the more awake the guard dog, and the more easily the sensor fires.',
   gate:'Danger and touch signals arrive from the left. The brain’s brake (blue) and accelerator (orange) arrive from the right. When the fire alarm cells are active, touch can pass the gate as danger.'};
 function setView(v){$('#body-scene').hidden=v!=='body';$('#ankle-scene').hidden=v!=='ankle';$('#zoom-scene').hidden=v!=='gate';
@@ -1324,6 +1410,9 @@ $('#tour-close').addEventListener('click',endTour);
 $('#copy-summary').addEventListener('click',()=>{const txt=summaryText();const fb=$('#summary-fallback');
   const fallback=()=>{fb.hidden=false;fb.value=txt;fb.focus();fb.select();toast('Select all and copy the text below');};
   try{navigator.clipboard.writeText(txt).then(()=>{fb.hidden=true;toast('Summary copied');},fallback);}catch(err){fallback();}});
+function fitExplore(){const g=$('.explore');if(!g||g.offsetParent===null)return;const top=g.getBoundingClientRect().top+scrollY;
+  document.documentElement.style.setProperty('--fit-h',Math.max(480,Math.round(innerHeight-top-16))+'px');}
+addEventListener('resize',fitExplore);if(document.fonts)document.fonts.ready.then(fitExplore);
 window.addEventListener('hashchange',route);
 route();
 
