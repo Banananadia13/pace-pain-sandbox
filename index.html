@@ -1,0 +1,1339 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Interactive pain science sandbox for PACE Health clients.">
+<title>Understanding Pain</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: an anatomy-plate workspace. Controls | the body figure | the readings, on a cool clinical ground. */
+:root{
+  --bg:#EEF3F1; --surface:#FFFFFF; --surface-2:#E3EBE8; --ink:#14302A; --muted:#556B65; --line:#CCD9D5;
+  --accent:#0E7D72; --accent-ink:#FFFFFF; --accent-soft:#D5ECE8;
+  --cns:#4150B5; --cns-soft:#C9CEF0; --pns:#0E8A7D; --signal:#E08A06; --pain:#D4432B; --damage:#8A5A33;
+  --cool:#2F7FD0; --warm:#E0532F; --body:#F9FBFA; --body-line:#B5C7C2; --focus:#4150B5;
+  --f-display:'Bricolage Grotesque','Trebuchet MS',system-ui,sans-serif;
+  --f-body:'Atkinson Hyperlegible','Segoe UI',system-ui,sans-serif;
+  --f-mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0E1714; --surface:#15211E; --surface-2:#1D2C28; --ink:#E4EEEB; --muted:#9AB0AA; --line:#2C3E39;
+  --accent:#3CC2B2; --accent-ink:#06201C; --accent-soft:#173B36;
+  --cns:#929EF6; --cns-soft:#2D3568; --pns:#3CC2B2; --signal:#F6B04A; --pain:#FF7660; --damage:#D2A47C;
+  --cool:#6AAEF0; --warm:#FF7A55; --body:#1A2824; --body-line:#3B514B; --focus:#929EF6; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#0E1714; --surface:#15211E; --surface-2:#1D2C28; --ink:#E4EEEB; --muted:#9AB0AA; --line:#2C3E39;
+  --accent:#3CC2B2; --accent-ink:#06201C; --accent-soft:#173B36;
+  --cns:#929EF6; --cns-soft:#2D3568; --pns:#3CC2B2; --signal:#F6B04A; --pain:#FF7660; --damage:#D2A47C;
+  --cool:#6AAEF0; --warm:#FF7A55; --body:#1A2824; --body-line:#3B514B; --focus:#929EF6; color-scheme:dark }
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 120px}
+h1,h2,h3{font-family:var(--f-display);font-weight:700;line-height:1.15;text-wrap:balance;margin:0}
+p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:6px}
+.wrap{max-width:1320px;margin:0 auto}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)}
+.num{font-variant-numeric:tabular-nums}
+
+/* Header */
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;padding-block:20px 14px;border-bottom:1px solid var(--line)}
+.brand h1{font-size:clamp(26px,3.4vw,36px)}
+.brand .eyebrow{margin-bottom:4px}
+.nav{display:flex;gap:4px;overflow-x:auto;max-width:100%;padding-bottom:2px}
+.nav a{white-space:nowrap;text-decoration:none;color:var(--muted);font-weight:700;padding:10px 14px;border-radius:999px;min-height:44px;display:inline-flex;align-items:center}
+.nav a:hover{color:var(--ink);background:var(--surface-2)}
+.nav a[aria-current="page"]{background:var(--ink);color:var(--bg)}
+.view{padding-block:22px 8px}
+
+/* Buttons and chips */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 18px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;font-weight:700;text-decoration:none}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.06)}
+.btn.small{min-height:36px;padding:6px 12px;font-size:14px;border-radius:10px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:40px;padding:7px 13px;border-radius:999px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-size:14px;line-height:1.3;text-align:left}
+.chip:hover{border-color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip.dim[aria-pressed="true"]{background:var(--warm);border-color:var(--warm);color:#fff}
+.chip.sim[aria-pressed="true"]{background:var(--cool);border-color:var(--cool);color:#fff}
+.chip .tag{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;opacity:.75;margin-right:6px}
+.seg{display:inline-flex;flex-wrap:wrap;gap:4px;padding:4px;border-radius:14px;background:var(--surface-2)}
+.seg button{min-height:38px;padding:6px 14px;border-radius:10px;border:0;background:transparent;cursor:pointer;font-weight:700;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgb(0 0 0 / .12)}
+
+/* Panels */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px;min-width:0}
+.panel h2{font-size:20px}
+.panel h3{font-size:16px}
+
+/* Start */
+.start{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:28px;align-items:start}
+.hero h2{font-size:clamp(34px,5vw,58px);letter-spacing:-.01em;max-width:14ch}
+.hero .lede{font-size:19px;max-width:52ch;margin-top:14px;color:var(--muted)}
+.qs{display:grid;gap:14px;margin-top:24px}
+.q{display:grid;gap:8px}
+.q label,.q .qlab{font-weight:700}
+textarea{width:100%;min-height:64px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);resize:vertical}
+.cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.start-figure{position:relative}
+.start-figure .cap{margin-top:8px;font-size:14px;color:var(--muted);text-align:center}
+
+/* Explore */
+.presets{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.story{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline}
+.story strong{font-family:var(--f-display);font-size:18px}
+.explore{display:grid;grid-template-columns:290px minmax(0,1fr) 300px;grid-template-areas:"controls body read";gap:18px;align-items:start}
+.controls{grid-area:controls;display:grid;gap:16px}
+.bodypanel{grid-area:body;display:flex;flex-direction:column;gap:10px}
+.readout{grid-area:read;display:grid;gap:14px}
+.group{display:grid;gap:14px}
+.group-head{display:flex;align-items:center;gap:8px}
+.group-head .dot{width:10px;height:10px;border-radius:50%}
+.group-head h3{font-size:16px}
+.ctl{display:grid;gap:4px}
+.ctl-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.ctl-top label{font-weight:700;font-size:15px}
+.ctl-top output{font-family:var(--f-mono);font-size:14px;color:var(--muted)}
+.ctl .sub{font-size:13px;color:var(--muted);line-height:1.35}
+.ends{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+input[type=range]{width:100%;accent-color:var(--accent);min-height:30px;cursor:pointer}
+.bodytools{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center}
+.figure-host svg{display:block;width:100%;height:auto;max-width:520px;margin:0 auto}
+.hint{font-size:13px;color:var(--muted);text-align:center}
+
+/* Meters */
+.meters{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.meter{display:grid;justify-items:center;gap:6px}
+.meter-track{position:relative;width:64px;height:190px;border-radius:14px;background:var(--surface-2);overflow:hidden}
+.meter-fill{position:absolute;left:0;right:0;bottom:0;height:0;border-radius:0 0 14px 14px}
+.m-damage .meter-fill{background:var(--damage)}
+.m-pain .meter-fill{background:var(--pain)}
+.meter-num{font-family:var(--f-display);font-size:40px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.meter-num small{font-size:16px;color:var(--muted);font-weight:500}
+.meter-label{font-weight:700;font-size:14px;text-align:center}
+.m-damage .meter-label{color:var(--damage)}
+.m-pain .meter-label{color:var(--pain)}
+.meters.h{grid-template-columns:1fr;gap:10px}
+.meters.h .meter{grid-template-columns:110px minmax(0,1fr) 44px;justify-items:stretch;align-items:center;gap:10px}
+.meters.h .meter-label{order:-1;text-align:left}
+.meters.h .meter-track{width:100%;height:16px;border-radius:999px}
+.meters.h .meter-fill{top:0;bottom:0;right:auto;height:auto!important;width:0;border-radius:999px}
+.meters.h .meter-num{font-size:22px;text-align:right}
+.meters.h .meter-num small{display:none}
+.why{font-size:16px;line-height:1.45;padding:14px;border-radius:14px;background:var(--accent-soft)}
+.why .eyebrow{display:block;margin-bottom:4px}
+.facts{display:grid;gap:8px}
+.fact{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:15px}
+.pill{font-family:var(--f-mono);font-size:13px;padding:4px 10px;border-radius:999px;background:var(--surface-2);white-space:nowrap}
+.pill.open{background:var(--signal);color:#1d1300}
+.pill.part{background:color-mix(in srgb,var(--signal) 35%,var(--surface-2))}
+.pill.louder{background:var(--warm);color:#fff}
+.pill.quieter{background:var(--cool);color:#fff}
+.scale{list-style:none;margin:0;padding:0;display:grid;gap:3px}
+.scale li{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--muted);padding:3px 8px;border-radius:8px}
+.scale li .sw{width:14px;height:14px;border-radius:4px;flex:none}
+.scale li.on{background:var(--surface-2);color:var(--ink);font-weight:700}
+
+/* SVG figure styling */
+.fig-out .solid{fill:var(--body-line);stroke:var(--body-line);stroke-width:3}
+.fig-out .limb{fill:none;stroke:var(--body-line);stroke-linecap:round}
+.fig-in .solid{fill:var(--body);stroke:none}
+.fig-in .limb{fill:none;stroke:var(--body);stroke-linecap:round}
+.cord{stroke:var(--cns-soft);stroke-width:11;stroke-linecap:round;fill:none}
+.cord-core{stroke:var(--cns);stroke-width:2.5;stroke-linecap:round;fill:none}
+.nerve{stroke:var(--pns);stroke-width:3;stroke-linecap:round;fill:none}
+.flow-pns,.flow-cord{fill:none;stroke:var(--signal);stroke-linecap:round}
+.ghost{fill:none;stroke:none}
+.brain-shape{fill:var(--cns-soft);stroke:var(--cns);stroke-width:2}
+.gyri{fill:none;stroke:var(--cns);stroke-width:1.5;stroke-linecap:round;opacity:.7}
+.brain-glow{fill:var(--pain)}
+.gate-bg{fill:var(--surface);stroke:var(--cns);stroke-width:1.5}
+.leaf{fill:var(--ink)}
+.star{fill:var(--warm)}
+.dial-cool{stroke:var(--cool);fill:none;stroke-width:6;stroke-linecap:round}
+.dial-warm{stroke:var(--warm);fill:none;stroke-width:6;stroke-linecap:round}
+.knob{fill:var(--surface);stroke:var(--ink);stroke-width:1.5}
+.needle{stroke:var(--ink);stroke-width:3;stroke-linecap:round}
+.dial-link{stroke:var(--muted);stroke-width:1.2;stroke-dasharray:3 4;fill:none}
+.svg-label{fill:var(--ink);font-family:var(--f-body);font-weight:700;font-size:14px}
+.svg-sub{fill:var(--muted);font-family:var(--f-body);font-size:12px}
+.svg-small{fill:var(--muted);font-family:var(--f-body);font-size:11px}
+.leader{stroke:var(--muted);stroke-width:1;fill:none}
+.tear{stroke:var(--damage);stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.sensor{cursor:pointer}
+.sensor-hit{fill:transparent}
+.sensor-dot{fill:var(--pns)}
+.sensor-ring{fill:none;stroke:var(--pns);stroke-width:1.5}
+.sensor:hover .sensor-ring,.sensor:focus-visible .sensor-ring{stroke-width:3}
+.sensor:focus-visible{outline:none}
+.pulse-s{fill:var(--signal)}
+.pulse-a{fill:var(--signal);stroke:var(--surface);stroke-width:1}
+.pulse-cool{fill:var(--cool)}
+.pulse-warm{fill:var(--warm)}
+.ring{fill:none;stroke:var(--accent);stroke-width:2.5;stroke-dasharray:5 5;opacity:0}
+.ring.on{opacity:1;animation:ringpulse 1.4s ease-in-out infinite}
+@keyframes ringpulse{50%{stroke-width:4}}
+.z-horn{fill:var(--surface-2);stroke:var(--line);stroke-width:1.5}
+.z-axon{stroke:var(--pns);stroke-width:7;fill:none;stroke-linecap:round}
+.z-bulb{fill:var(--accent-soft);stroke:var(--pns);stroke-width:2.5}
+.z-cell{fill:var(--cns-soft);stroke:var(--cns);stroke-width:2.5}
+.z-up{stroke:var(--cns);stroke-width:7;fill:none;stroke-linecap:round}
+.z-desc{stroke:var(--muted);stroke-width:5;fill:none;stroke-linecap:round}
+.z-desc-term{fill:var(--surface);stroke:var(--muted);stroke-width:2.5}
+.astro{fill:var(--warm)}
+.astro-arm{stroke:var(--warm);stroke-width:3.5;stroke-linecap:round;fill:none}
+.nt{fill:var(--signal)}
+.cyto{fill:var(--pain)}
+
+/* Compare */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.cmp{display:grid;gap:12px;align-content:start}
+.cmp select{width:100%;min-height:44px;padding:8px 12px;border-radius:12px;border:1px solid var(--line);background:var(--surface)}
+.cmp .figure-host svg{max-width:360px}
+.cmp .take{font-weight:700}
+
+/* Healing */
+.healing{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start}
+.chart-host{overflow-x:auto}
+.chart-host svg{display:block;width:100%;min-width:520px;height:auto}
+.peaks-tol{stroke:#E8820C;stroke-width:3;fill:none}
+.peaks-thr{stroke:#8B4FE0;stroke-width:3;fill:none}
+.peaks-daily{stroke:var(--muted);stroke-width:2;fill:none;stroke-dasharray:6 5}
+.peaks-zone{fill:#E8820C;opacity:.16}
+.peaks-axis{stroke:var(--ink);stroke-width:1.5}
+.peaks-grid{stroke:var(--line);stroke-width:1}
+.peaks-band-0{fill:var(--pain);opacity:.10}
+.peaks-band-1{fill:var(--signal);opacity:.10}
+.peaks-band-2{fill:var(--accent);opacity:.10}
+.peaks-now{stroke:var(--ink);stroke-width:1.5}
+.peaks-injury{stroke:var(--muted);stroke-width:1.2;stroke-dasharray:3 4}
+.lab-tol{fill:#C46A06;font-weight:700;font-size:13px;font-family:var(--f-body)}
+.lab-thr{fill:#7A3FD0;font-weight:700;font-size:13px;font-family:var(--f-body)}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .lab-tol{fill:#F2A040} :root:not([data-theme="light"]) .lab-thr{fill:#B48CF5} :root:not([data-theme="light"]) .peaks-thr{stroke:#A97BF2} }
+:root[data-theme="dark"] .lab-tol{fill:#F2A040} :root[data-theme="dark"] .lab-thr{fill:#B48CF5} :root[data-theme="dark"] .peaks-thr{stroke:#A97BF2}
+.dot-tol{fill:#E8820C}.dot-thr{fill:#8B4FE0}
+.callout-box{fill:var(--surface);stroke:var(--pain);stroke-width:1.5}
+.hctl{display:grid;gap:16px}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:14px;margin-top:10px}
+.legend span{display:inline-flex;align-items:center;gap:8px}
+.legend i{display:inline-block;width:22px;height:4px;border-radius:2px}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--f-mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.tables{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
+.table-wrap{overflow-x:auto}
+
+/* My plan */
+.plan{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start}
+.plan-main{display:grid;gap:18px;min-width:0}
+.plan-side{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);display:grid;gap:14px}
+.cat{display:grid;grid-template-columns:200px minmax(0,1fr);gap:10px 16px;padding-block:14px;border-top:1px solid var(--line)}
+.cat:first-of-type{border-top:0}
+.cat h3{font-size:15px;font-family:var(--f-body)}
+.cat .rows{display:grid;gap:8px}
+.addrow{display:flex;flex-wrap:wrap;gap:6px}
+.addrow input{flex:1 1 180px;min-width:0;min-height:40px;padding:6px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface)}
+.loop{display:grid;gap:12px}
+.loop-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.loop-row .step{padding:8px 12px;border-radius:10px;font-weight:700;font-size:14px}
+.loop-row.fear .step{background:color-mix(in srgb,var(--warm) 16%,var(--surface));border:1px solid color-mix(in srgb,var(--warm) 45%,transparent)}
+.loop-row.cur .step{background:color-mix(in srgb,var(--cool) 16%,var(--surface));border:1px solid color-mix(in srgb,var(--cool) 45%,transparent)}
+.loop-row .arr{color:var(--muted)}
+.loop-row .back{font-family:var(--f-mono);font-size:13px;color:var(--warm)}
+details.answer{margin-top:6px}
+details.answer summary{cursor:pointer;font-weight:700;color:var(--accent);min-height:36px;display:flex;align-items:center}
+.revisit{display:grid;gap:14px}
+.revisit .then{font-size:14px;color:var(--muted)}
+
+/* Tour */
+.tour{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;justify-content:center;
+  padding:0 max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));pointer-events:none}
+.tour-card{pointer-events:auto;width:min(620px,100%);background:var(--ink);color:var(--bg);border-radius:18px;padding:16px 18px;box-shadow:0 10px 30px rgb(0 0 0 / .25);display:grid;gap:8px}
+.tour-card h3{font-size:20px}
+.tour-card .eyebrow{color:color-mix(in srgb,var(--bg) 70%,transparent)}
+.tour-card .row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.tour-card .btn{background:transparent;color:var(--bg);border-color:color-mix(in srgb,var(--bg) 40%,transparent)}
+.tour-card .btn.primary{background:var(--bg);color:var(--ink);border-color:var(--bg)}
+.tour-dots{display:flex;gap:5px}
+.tour-dots i{width:8px;height:8px;border-radius:50%;background:color-mix(in srgb,var(--bg) 30%,transparent)}
+.tour-dots i.on{background:var(--bg)}
+
+/* Footer */
+.foot{margin-top:28px;padding-top:16px;border-top:1px solid var(--line);font-size:14px;color:var(--muted);display:grid;gap:8px}
+.foot summary{cursor:pointer;font-weight:700;color:var(--ink);min-height:36px;display:flex;align-items:center}
+.foot ul{margin:6px 0 0;padding-left:20px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;z-index:30;font-weight:700}
+
+
+/* v2 additions */
+:root{--guard0:#3A9A47;--guard1:#2F7FD0;--guard2:#D9A200;--guard3:#C83A2A;--fire0:#D7E0DD}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){--guard0:#5BBF68;--guard1:#6AAEF0;--guard2:#F2C230;--guard3:#F0604E;--fire0:#33433F} }
+:root[data-theme="dark"]{--guard0:#5BBF68;--guard1:#6AAEF0;--guard2:#F2C230;--guard3:#F0604E;--fire0:#33433F}
+.tools-right{display:flex;gap:8px;flex-wrap:wrap}
+.dg-head{fill:var(--surface);stroke:var(--ink);stroke-width:1.5}
+.dg-ear{fill:var(--damage);stroke:var(--ink);stroke-width:1}
+.dg-nose,.dg-eye{fill:var(--ink)}
+.dg-line{stroke:var(--ink);stroke-width:1.5;fill:none;stroke-linecap:round}
+.dg-zz{font:700 8px var(--f-body);fill:var(--muted)}
+.dg-ring{fill:var(--surface);stroke-width:2.5;fill-opacity:.85}
+.bb-track{fill:var(--surface-2)}
+.bb-brake{fill:var(--cool)}
+.bb-accel{fill:var(--warm)}
+.pulse-t{fill:var(--surface);stroke:var(--pns);stroke-width:1.5}
+.nt-t{fill:var(--muted)}
+.z-touchax{stroke:var(--muted);stroke-width:6;fill:none;stroke-linecap:round;stroke-dasharray:16 4}
+.z-tbulb{fill:var(--surface);stroke:var(--muted);stroke-width:2.5}
+.z-brake{stroke:var(--cool);stroke-width:5;fill:none;stroke-linecap:round}
+.z-brake-term{fill:var(--surface);stroke:var(--cool);stroke-width:2.5}
+.z-accel{stroke:var(--warm);stroke-width:5;fill:none;stroke-linecap:round}
+.z-accel-term{fill:var(--surface);stroke:var(--warm);stroke-width:2.5}
+.mg-arm{stroke:var(--accent);stroke-width:1.8;fill:none;stroke-linecap:round}
+.mg-body{fill:var(--accent)}
+.ak-tissue{fill:color-mix(in srgb,var(--pain) 7%,var(--surface-2));stroke:var(--line);stroke-width:1.5}
+.ak-fibre{fill:none;stroke:color-mix(in srgb,var(--damage) 45%,var(--surface-2));stroke-width:3;stroke-linecap:round}
+.ak-branch{fill:none;stroke:var(--pns);stroke-width:4;stroke-linecap:round}
+.ak-tip{fill:var(--pns)}
+.ak-capsule{fill:var(--surface);stroke:var(--muted);stroke-width:2.5}
+.ak-chem{fill:var(--signal)}
+.imm-mast circle{fill:var(--cns)}
+.imm-mast .imm-spikes{fill:none;stroke:var(--cns);stroke-width:3;stroke-dasharray:2 3}
+.imm-neut circle{fill:var(--pain);opacity:.85}
+.imm-t circle{fill:var(--cool);stroke:var(--surface);stroke-width:1.5;stroke-dasharray:2 2}
+.gauge svg{display:block;width:100%;max-width:260px;margin:6px auto 0}
+.g-seg.dim{opacity:.3}
+.g-needle{transition:transform .5s ease}
+.g-needle line{stroke:var(--ink);stroke-width:4;stroke-linecap:round}
+.g-needle circle{fill:var(--ink)}
+.g-read{display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--f-display);font-size:20px}
+.g-sw{width:16px;height:16px;border-radius:4px;display:inline-block}
+.gauge .muted{text-align:center}
+.tiny{font-size:12px;color:var(--muted);text-align:center;margin-top:4px}
+.chip .chem{display:block;font-size:12px;opacity:.75;margin-top:2px;font-weight:400}
+.chem-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.chem-h{font-size:15px;font-family:var(--f-body);margin-bottom:8px;padding-left:10px;border-left:4px solid}
+.chem-h.down{border-color:var(--cool)}.chem-h.up{border-color:var(--warm)}
+.chemlist{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.chemlist li{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.4;padding:8px 10px;border-radius:10px;background:var(--surface-2);opacity:.75}
+.chemlist li.on{opacity:1;background:var(--accent-soft)}
+.chemlist .cdot{width:10px;height:10px;border-radius:50%;background:var(--line);flex:none;margin-top:5px}
+.chemlist li.on .cdot{background:var(--accent)}
+.chemlist .active{font-family:var(--f-mono);font-size:11px;padding:1px 6px;border-radius:999px;background:var(--accent);color:var(--accent-ink);margin-left:4px}
+@media (max-width:720px){.chem-grid{grid-template-columns:1fr}}
+@media (prefers-reduced-motion: reduce){.g-needle{transition:none}}
+
+/* Responsive */
+@media (max-width:1180px){
+  .explore{grid-template-columns:minmax(0,1fr) 300px;grid-template-areas:"body read" "controls controls"}
+  .controls{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (max-width:900px){
+  .start,.healing,.plan{grid-template-columns:minmax(0,1fr)}
+  .plan-side{position:static}
+  .controls{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tables{grid-template-columns:1fr}
+}
+@media (max-width:720px){
+  .explore{grid-template-columns:minmax(0,1fr);grid-template-areas:"body" "read" "controls"}
+  .controls{grid-template-columns:minmax(0,1fr)}
+  .compare{grid-template-columns:1fr}
+  .cat{grid-template-columns:minmax(0,1fr)}
+  .meter-track{height:150px}
+  .panel{padding:14px}
+}
+@media (prefers-reduced-motion: reduce){ .ring.on{animation:none} }
+</style>
+<style>html{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <p class="eyebrow">PACE Health · Pain education</p>
+      <h1>Understanding Pain</h1>
+    </div>
+    <nav class="nav" aria-label="Sections">
+      <a href="#start" data-view="start">Start</a>
+      <a href="#explore" data-view="explore">Explore</a>
+      <a href="#compare" data-view="compare">Compare</a>
+      <a href="#healing" data-view="healing">Healing over time</a>
+      <a href="#my-plan" data-view="my-plan">What can I do?</a>
+    </nav>
+  </header>
+
+  <!-- START -->
+  <section class="view" id="view-start" hidden>
+    <div class="start">
+      <div class="hero">
+        <p class="eyebrow">Before you start</p>
+        <h2>If it hurts, is something damaged?</h2>
+        <p class="lede">Pain is real, and it is your body's alarm system. This sandbox lets you change the things that influence pain and watch how your nervous system responds.</p>
+        <div class="qs">
+          <div class="q">
+            <span class="qlab" id="q1-lab">1. Does pain mean something is damaged?</span>
+            <div class="chips" role="group" aria-labelledby="q1-lab" id="q1">
+              <button class="chip" data-q1="Always" aria-pressed="false">Always</button>
+              <button class="chip" data-q1="Sometimes" aria-pressed="false">Sometimes</button>
+              <button class="chip" data-q1="Never" aria-pressed="false">Never</button>
+              <button class="chip" data-q1="Not sure" aria-pressed="false">Not sure</button>
+            </div>
+          </div>
+          <div class="q">
+            <label for="q2">2. When is pain helpful?</label>
+            <textarea id="q2" placeholder="Your answer (optional)"></textarea>
+          </div>
+          <div class="q">
+            <label for="q3">3. When is pain unhelpful?</label>
+            <textarea id="q3" placeholder="Your answer (optional)"></textarea>
+          </div>
+        </div>
+        <div class="cta">
+          <button class="btn primary" id="start-tour">Take the guided tour · 8 steps</button>
+          <a class="btn" href="#explore">Explore freely</a>
+        </div>
+      </div>
+      <div class="start-figure panel">
+        <div class="figure-host" id="start-scene"></div>
+        <p class="cap">Live preview: an ankle sprain, day 1. Signals travel from the ankle to the brain.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPLORE -->
+  <section class="view" id="view-explore" hidden>
+    <div class="presets">
+      <div class="chips" id="preset-chips" role="group" aria-label="Scenarios"></div>
+      <div class="story" aria-live="polite"><strong id="story-name"></strong><span id="story-text" class="muted"></span></div>
+    </div>
+    <div class="explore">
+      <div class="controls" id="controls"></div>
+      <div class="bodypanel panel">
+        <div class="bodytools">
+          <div class="seg" role="group" aria-label="View">
+            <button id="v-body" aria-pressed="true">Whole body</button>
+            <button id="v-ankle" aria-pressed="false">Zoom: ankle</button>
+            <button id="v-gate" aria-pressed="false">Zoom: gate</button>
+          </div>
+          <div class="tools-right">
+            <button class="btn small" id="poke">Send a signal</button>
+            <button class="btn small" data-exercise>Exercise 10 min</button>
+            <button class="btn small" id="reset">Reset</button>
+          </div>
+        </div>
+        <div class="figure-host" id="body-scene"></div>
+        <div class="figure-host" id="ankle-scene" hidden></div>
+        <div class="figure-host" id="zoom-scene" hidden></div>
+        <p class="hint" id="figure-hint">Tap the ankle to send a signal. Small signals fade at the gate; strong ones travel up to the brain.</p>
+      </div>
+      <aside class="readout">
+        <div class="panel">
+          <div class="meters" id="explore-meters"></div>
+        </div>
+        <div class="why" aria-live="polite"><span class="eyebrow">Why?</span><span id="why"></span></div>
+        <div class="panel facts">
+          <div class="fact"><span>Guard dog at the ankle</span><span class="pill" id="f-guard"></span></div>
+          <div class="fact"><span>The gate</span><span class="pill" id="f-gate"></span></div>
+          <div class="fact"><span>Fire alarm at the gate</span><span class="pill" id="f-alarm"></span></div>
+          <div class="fact"><span>Touch is read as</span><span class="pill" id="f-touch"></span></div>
+          <div class="fact"><span>Brake from the brain</span><span class="pill" id="f-brake"></span></div>
+          <div class="fact"><span>Accelerator</span><span class="pill" id="f-accel"></span></div>
+          <div class="fact" id="f-ex-row" hidden><span>Exercise effect</span><span class="pill quieter" id="f-ex"></span></div>
+        </div>
+        <div class="panel gauge">
+          <h3>Protection level</h3>
+          <svg id="gauge" viewBox="0 0 240 124" role="img" aria-label="Protection level gauge"></svg>
+          <div class="g-read"><span class="g-sw" id="g-sw"></span><strong id="g-name"></strong></div>
+          <p class="muted" id="g-text" style="font-size:14px"></p>
+          <p class="tiny">Styled on Australia’s fire danger ratings.</p>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- COMPARE -->
+  <section class="view" id="view-compare" hidden>
+    <div style="display:grid;gap:6px;margin-bottom:16px">
+      <h2 style="font-size:28px">Same body, different pain</h2>
+      <p class="muted" style="max-width:70ch">Pick two scenarios. The body is the same; only the damage and the context change. Watch which one hurts more and why.</p>
+    </div>
+    <div class="compare">
+      <div class="cmp panel" id="cmp-a"></div>
+      <div class="cmp panel" id="cmp-b"></div>
+    </div>
+  </section>
+
+  <!-- HEALING -->
+  <section class="view" id="view-healing" hidden>
+    <div style="display:grid;gap:6px;margin-bottom:16px">
+      <h2 style="font-size:28px">Twin Peaks: protection over time</h2>
+      <p class="muted" style="max-width:72ch">After an injury, your pain threshold drops further than your tissue tolerance. The gap between them is a protection zone. Drag through time to see how it changes as tissue heals.</p>
+    </div>
+    <div class="healing">
+      <div class="panel">
+        <div class="chart-host"><svg id="peaks" viewBox="0 0 680 380" role="img" aria-label="Twin Peaks graph of tissue tolerance and pain threshold over time"></svg></div>
+        <div class="legend">
+          <span><i style="background:#E8820C"></i>Tissue tolerance</span>
+          <span><i style="background:#8B4FE0"></i>Pain threshold</span>
+          <span><i style="background:var(--muted)"></i>Daily activities</span>
+          <span><i style="background:#E8820C;opacity:.3;height:12px"></i>Protection zone</span>
+        </div>
+      </div>
+      <div class="panel hctl">
+        <div class="ctl">
+          <span class="eyebrow">Tissue</span>
+          <div class="seg" role="group" aria-label="Tissue type" id="tissue-seg">
+            <button data-tissue="muscle" aria-pressed="false">Muscle</button>
+            <button data-tissue="bone" aria-pressed="false">Bone</button>
+            <button data-tissue="connective" aria-pressed="true">Ligament, tendon, disc</button>
+          </div>
+        </div>
+        <div class="ctl">
+          <span class="eyebrow">Healing path</span>
+          <div class="seg" role="group" aria-label="Healing path" id="path-seg">
+            <button data-path="normal" aria-pressed="true">Normal healing</button>
+            <button data-path="persistent" aria-pressed="false">Persistent pain</button>
+          </div>
+        </div>
+        <label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer">
+          <input type="checkbox" id="graded" style="width:20px;height:20px;margin-top:2px;accent-color:var(--accent)">
+          <span><strong>Add graded exposure</strong><br><span class="muted" style="font-size:14px">Gradually doing more raises the pain threshold in steps.</span></span>
+        </label>
+        <div class="ctl">
+          <div class="ctl-top"><label for="h-time">Time since injury</label><output id="h-time-out" class="num"></output></div>
+          <input type="range" id="h-time" min="0" max="1000" step="1" value="0">
+          <span class="sub" id="h-phase"></span>
+        </div>
+        <div class="meters h" id="healing-meters"></div>
+        <a class="btn" href="#explore">See this in the body</a>
+      </div>
+    </div>
+    <div class="tables">
+      <div class="panel table-wrap">
+        <h3 style="margin-bottom:8px">Healing phases</h3>
+        <table>
+          <thead><tr><th>Phase</th><th>Timing</th><th>What is happening</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Inflammation</strong></td><td>Hours to days</td><td>Immune cells clean up debris</td></tr>
+            <tr><td><strong>Proliferation</strong></td><td>Days to weeks</td><td>Collagen is laid down, new blood vessels form, the wound pulls together</td></tr>
+            <tr><td><strong>Remodelling</strong></td><td>Weeks to months</td><td>Collagen fibres cross-link and realign</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="panel table-wrap">
+        <h3 style="margin-bottom:8px">Typical healing times</h3>
+        <table>
+          <thead><tr><th>Tissue</th><th>Healing time</th></tr></thead>
+          <tbody>
+            <tr><td>Muscle strain, tear or pull</td><td class="num">3–6 weeks</td></tr>
+            <tr><td>Bone fracture</td><td class="num">6–8 weeks</td></tr>
+            <tr><td>Ligament, tendon, labrum, disc</td><td class="num">12–18 months</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- MY PLAN -->
+  <section class="view" id="view-my-plan" hidden>
+    <div style="display:grid;gap:6px;margin-bottom:16px">
+      <h2 style="font-size:28px">What can I do?</h2>
+      <p class="muted" style="max-width:72ch">DIMs (Danger In Me) turn the volume up. SIMs (Safety In Me) turn it down. Pick the ones that are true for you, add your own, and watch the dial.</p>
+    </div>
+    <div class="plan">
+      <div class="plan-main">
+        <div class="panel">
+          <h2 style="margin-bottom:4px">My DIMs and SIMs</h2>
+          <p class="muted" style="font-size:14px;margin-bottom:8px">Some things appear on both sides. A hospital can feel scary or safe. What matters is what it means to you.</p>
+          <div id="cats"></div>
+        </div>
+        <div class="panel">
+          <h2 style="margin-bottom:4px">My dials</h2>
+          <p class="muted" style="font-size:14px;margin-bottom:12px">Things you can turn. Each one you switch on counts as a SIM. The small line shows what it changes in your body.</p>
+          <div class="chips" id="dials"></div>
+        </div>
+        <div class="panel">
+          <h2 style="margin-bottom:4px">Your body’s own chemistry</h2>
+          <p class="muted" style="font-size:14px;margin-bottom:12px">Your brain and spinal cord release chemicals that work the brake or the accelerator at the gate. Your choices change which ones are active.</p>
+          <div class="chem-grid">
+            <div><h3 class="chem-h down">Brake: turns pain down</h3><ul class="chemlist" id="chem-down"></ul></div>
+            <div><h3 class="chem-h up">Accelerator: turns pain up</h3><ul class="chemlist" id="chem-up"></ul></div>
+          </div>
+        </div>
+        <div class="panel loop">
+          <h2>Two paths after pain</h2>
+          <div class="loop-row fear" aria-label="Fear avoidance path">
+            <span class="step">Pain</span><span class="arr">→</span><span class="step">Worst-case thinking</span><span class="arr">→</span><span class="step">Fear of movement</span><span class="arr">→</span><span class="step">Avoidance</span><span class="arr">→</span><span class="step">Less fit, low mood</span><span class="back">↺ more pain</span>
+          </div>
+          <div class="loop-row cur" aria-label="Curiosity path">
+            <span class="step">Pain</span><span class="arr">→</span><span class="step">Curiosity, less fear</span><span class="arr">→</span><span class="step">Gradual exposure</span><span class="arr">→</span><span class="step">Recovery</span>
+          </div>
+          <p class="muted" style="font-size:14px">Your EP helps you move from the top path to the bottom one with education, gradual exposure and talking through unhelpful beliefs.</p>
+        </div>
+        <div class="panel revisit">
+          <h2>Look back at the start</h2>
+          <div class="q">
+            <span class="qlab">Does pain mean something is damaged?</span>
+            <span class="then" id="rv-q1"></span>
+            <details class="answer"><summary>What pain science says</summary><p>Sometimes. Pain and damage are related but not the same. You can have damage without pain, and pain without damage. Pain is a protector: a prediction of what could happen, not a report of what has happened.</p></details>
+          </div>
+          <div class="q">
+            <span class="qlab">When is pain helpful?</span>
+            <span class="then" id="rv-q2"></span>
+            <details class="answer"><summary>What pain science says</summary><p>When it protects tissue that is healing, like a fresh ankle sprain. Pain changes your behaviour so you give the area extra care while it repairs.</p></details>
+          </div>
+          <div class="q">
+            <span class="qlab">When is pain unhelpful?</span>
+            <span class="then" id="rv-q3"></span>
+            <details class="answer"><summary>What pain science says</summary><p>When it protects you after you no longer need protecting, such as after tissue has healed. Pain can be learned, and it can be relearned too.</p></details>
+          </div>
+        </div>
+        <div class="panel" style="display:grid;gap:12px">
+          <h2>Reflect</h2>
+          <div class="q"><label for="r1">What surprised you?</label><textarea id="r1"></textarea></div>
+          <div class="q"><label for="r2">Which one SIM will you add this week?</label><textarea id="r2"></textarea></div>
+          <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+            <button class="btn primary" id="copy-summary">Copy my summary</button>
+            <span class="muted" style="font-size:14px">Paste it into a note or email to bring to your next session. Nothing is sent anywhere.</span>
+          </div>
+          <textarea id="summary-fallback" hidden readonly style="min-height:160px"></textarea>
+        </div>
+      </div>
+      <aside class="plan-side">
+        <div class="panel" style="display:grid;gap:12px">
+          <span class="eyebrow">With your choices</span>
+          <div class="meters" id="plan-meters"></div>
+          <div class="facts">
+            <div class="fact"><span>Brake</span><span class="pill" id="p-brake"></span></div>
+            <div class="fact"><span>Accelerator</span><span class="pill" id="p-accel"></span></div>
+            <div class="fact" id="p-ex-row" hidden><span>Exercise effect</span><span class="pill quieter" id="p-ex"></span></div>
+            <div class="fact"><span>DIMs chosen</span><span class="pill num" id="p-dims">0</span></div>
+            <div class="fact"><span>SIMs chosen</span><span class="pill num" id="p-sims">0</span></div>
+          </div>
+          <button class="btn primary" data-exercise>Do 10 minutes of exercise</button>
+          <p class="muted" style="font-size:13px">Based on the current scenario in Explore: <strong id="p-scn"></strong>.</p>
+        </div>
+        <div class="why"><span class="eyebrow">Remember</span>Hurt does not always mean harm. Respect healing times, keep moving gradually, and your EP will help you find the right amount.</div>
+      </aside>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <p>This is an education tool, not a diagnosis. The numbers are examples to show how pain works, not a prediction of your pain.</p>
+    <details>
+      <summary>When to see a doctor promptly</summary>
+      <ul>
+        <li>Loss of sensation, or major weakness</li>
+        <li>Changes to bowel, bladder or sexual function</li>
+        <li>Pain after a major trauma, fall or collision</li>
+        <li>Significant redness, heat or swelling, or signs of infection</li>
+        <li>A history of cancer, or night pain that stops you getting back to sleep</li>
+        <li>Unexplained weight loss of more than 4 kg</li>
+      </ul>
+    </details>
+  </footer>
+</div>
+
+<div class="tour" id="tour" hidden>
+  <div class="tour-card" role="dialog" aria-labelledby="tour-title">
+    <div class="row"><span class="eyebrow" id="tour-step"></span><div class="tour-dots" id="tour-dots"></div></div>
+    <h3 id="tour-title"></h3>
+    <p id="tour-text"></p>
+    <div class="row">
+      <button class="btn small" id="tour-close">Exit tour</button>
+      <div style="display:flex;gap:8px"><button class="btn small" id="tour-back">Back</button><button class="btn small primary" id="tour-next">Next</button></div>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const SVGNS='http://www.w3.org/2000/svg';
+const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/*MODEL-START*/
+const CONFIG={sensorScale:0.4,loadWeight:0.8,inflamGain:0.06,alarmGain:0.15,gate:1,
+  brakeBase:0.43,brakeSafe:0.74,brakeThreat:0.03,brakeAlarm:0.01,brakeExercise:0.2,accelThreat:0.6,
+  gateBrake:1.25,gateAccel:0.3,dialAccel:0.64,dialBrake:1.14,
+  touchAlarm:0.72,touchAccel:0.21,touchBase:0.5,touchScale:0.6,
+  predictionGain:5.5,predictionStart:0.4,exerciseAlarm:0.46,
+  threat:{worst:0.07,stress:0.05,focus:0.04,understanding:0.06,chip:0.08}};
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+function setSize(x){return x?(x.size!==undefined?x.size:x.length):0;}
+function threatScore(s){const t=CONFIG.threat;
+  const raw=t.worst*(s.worst-3)+t.stress*(s.stress-3)+t.focus*(s.focus-5)-t.understanding*(s.understanding-5)+t.chip*(setSize(s.dims)-setSize(s.sims));
+  return clamp(raw,-1,1);}
+function painModel(s){const C=CONFIG,th=threatScore(s),ex=s.ex||0;
+  const alarm=Math.max(0,s.alarm-C.exerciseAlarm*ex);
+  const N=C.sensorScale*(s.damage+C.loadWeight*s.load)*(1+C.inflamGain*s.inflam);
+  const S=1+C.alarmGain*alarm;
+  const b=clamp(C.brakeBase+C.brakeSafe*Math.max(0,-th)-C.brakeThreat*Math.max(0,th)-C.brakeAlarm*alarm+C.brakeExercise*ex,0,1);
+  const a=clamp(C.accelThreat*Math.max(0,th),0,1);
+  const G=C.gate*(1+C.gateBrake*(b-C.brakeBase)-C.gateAccel*a);
+  const D=1+C.dialAccel*a-C.dialBrake*(b-C.brakeBase);
+  const w=clamp(C.touchAlarm*alarm/10+C.touchAccel*a-C.touchBase,0,1);
+  const M=C.touchScale*((s.load||0)+(s.touch||0));
+  const NS=(N+w*M)*S, T=Math.max(0,NS-G), pred=C.predictionGain*Math.max(0,th-C.predictionStart);
+  return {N,M,w,S,NS,G,T,th,a,b,D,pred,alarm,P:Math.min(10,T*D+pred)};}
+function guardLevel(s){const g=0.7*s.inflam+0.3*s.damage;return g<2?0:g<4?1:g<6.5?2:3;}
+const GUARD=['Asleep','Resting','Alert','On guard'];
+const PRESETS=[
+  {id:'everyday',name:'Everyday walking',story:'You are walking to the shops. Nothing is hurt.',take:'Signals fire all the time, but most never pass the gate.',v:{damage:0,load:2,touch:2,inflam:0,alarm:1,worst:3,stress:3,focus:5,understanding:5}},
+  {id:'doms',name:'DOMS, day 2',story:'You tried a new leg workout two days ago. Stairs feel awful today.',take:'Sore is not harm. It settles in a few days.',target:3.4,v:{damage:1,load:6,touch:3,inflam:6,alarm:2,worst:4,stress:4,focus:5,understanding:5}},
+  {id:'sprain1',name:'Ankle sprain, day 1',story:'You rolled your ankle stepping off a kerb this morning. It is swollen.',take:'Here pain matches the damage. It is doing a useful job.',target:8.1,v:{damage:7,load:4,touch:2,inflam:8,alarm:3,worst:3,stress:3,focus:5,understanding:5}},
+  {id:'sprainworst',name:'Sprain + worst-case thinking',story:'Same ankle. You are sure something is broken and you will miss the whole season.',take:'Same damage, louder pain. The accelerator matters.',target:10,v:{damage:7,load:4,touch:2,inflam:8,alarm:3,worst:10,stress:7,focus:8,understanding:5}},
+  {id:'sprain3',name:'Ankle sprain, week 3',story:'Three weeks on. The swelling has gone and you walk further each day.',take:'Healing is on track and pain is easing.',target:3.2,v:{damage:3,load:5,touch:2,inflam:2,alarm:2,worst:3,stress:3,focus:5,understanding:5}},
+  {id:'midgame',name:'Mid-game knock',story:'You take a hard knock in the second half of a close game and keep playing.',take:'Real damage, little pain. Feeling safe and focused puts the brake on.',target:1.5,v:{damage:6,load:6,touch:4,inflam:3,alarm:1,worst:0,stress:0,focus:0,understanding:9}},
+  {id:'tendon',name:'Sensitive tendon',story:'You doubled your running this week. Your Achilles is grumpy in the morning.',take:'A sensitive system, not a damaged one.',target:4.4,v:{damage:1,load:6,touch:3,inflam:4,alarm:4,worst:6,stress:4,focus:6,understanding:5}},
+  {id:'persistent',name:'Persistent pain, 6+ months',story:'Your ankle healed months ago, but it still hurts most days.',take:'The tissue has healed, but the alarm stayed on.',target:7.0,v:{damage:1,load:4,touch:3,inflam:1,alarm:7,worst:8,stress:7,focus:8,understanding:4}},
+  {id:'touch',name:'Touch hurts',story:'Months after your ankle healed, a sock or the bedsheet brushing your ankle hurts.',take:'The gate now reads touch as danger. This is sensitivity, not damage.',target:4.7,v:{damage:0,load:1,touch:6,inflam:1,alarm:9,worst:7,stress:7,focus:8,understanding:4}},
+  {id:'fear',name:'Fear, no damage',story:'A friendly dog puts its paw on your leg. You have been scared of dogs since childhood.',take:'Pain without damage is still real pain.',target:2.8,v:{damage:0,load:1,touch:6,inflam:0,alarm:1,worst:10,stress:8,focus:9,understanding:5}}
+];
+/*MODEL-END*/
+
+const presetById=id=>PRESETS.find(p=>p.id===id);
+
+const TISSUES={muscle:{label:'Muscle',days:32},bone:{label:'Bone',days:49},connective:{label:'Ligament, tendon, disc',days:456}};
+const smooth=(e0,e1,x)=>{const t=clamp((x-e0)/(e1-e0),0,1);return t*t*(3-2*t);};
+
+const CATS=[
+  {id:'sense',name:'Things I hear, see, smell, taste or touch',dim:['Looking at my x-ray','Sounds at the dentist'],sim:['Hearing my scan is all clear','A gentle massage']},
+  {id:'do',name:'Things I do',dim:['Only taking pills','Staying home all the time'],sim:['Gentle exercise','Learning about pain']},
+  {id:'say',name:'Things I say',dim:['“It’s just old age”','“Be careful of your back”'],sim:['“There is hope”','“I understand what is happening”']},
+  {id:'think',name:'Things I think and believe',dim:['Pain is forever','Hurt always means harm'],sim:['Broken bones can heal in 6 weeks','I believe in my health professional']},
+  {id:'places',name:'Places I go',dim:['Hospital','Surgeon’s office'],sim:['Hospital','Dance class']},
+  {id:'people',name:'People in my life',dim:['A nosey neighbour','An out-of-date health professional'],sim:['Friends who understand me','An up-to-date health professional']},
+  {id:'body',name:'Things happening in my body',dim:['Feeling low or anxious','Acute inflammation'],sim:['Feeling happy and optimistic','Acute inflammation']}
+];
+const DIALS=[{l:'Sleep routine',c:'steadier cortisol'},{l:'Managing stress',c:'less adrenaline and cortisol'},{l:'Understanding my pain',c:'less threat, more brake'},{l:'Gentle regular movement',c:'endorphins, endocannabinoids'},{l:'Pacing, not boom and bust',c:'fewer flare-ups'},{l:'Doing things I enjoy',c:'dopamine, serotonin'},{l:'People who support me',c:'oxytocin'}];
+const QUICK=['d:sense:0','d:say:1','d:think:1','s:sense:0','s:do:0','s:people:0'];
+const LABELS={};
+CATS.forEach(c=>{c.dim.forEach((l,i)=>LABELS[`d:${c.id}:${i}`]={label:l,type:'dim',cat:c.id});c.sim.forEach((l,i)=>LABELS[`s:${c.id}:${i}`]={label:l,type:'sim',cat:c.id});});
+DIALS.forEach((d,i)=>LABELS[`dial:${i}`]={label:d.l,type:'sim',cat:'dial',chem:d.c});
+
+/* ---------- State ---------- */
+const state={damage:7,load:4,touch:2,ex:0,inflam:8,alarm:3,worst:3,stress:3,focus:5,understanding:5,dims:new Set(),sims:new Set(),
+  time:1,tissue:'connective',path:'normal',graded:false,presetId:'sprain1'};
+const store={q1:'',q2:'',q3:'',r1:'',r2:'',chips:[],custom:[]};
+function save(){try{store.chips=[...state.dims,...state.sims];localStorage.setItem('pace-pain-v1',JSON.stringify(store));}catch(e){}}
+function load(){try{const raw=localStorage.getItem('pace-pain-v1');if(raw)Object.assign(store,JSON.parse(raw));}catch(e){}
+  (store.custom||[]).forEach(c=>LABELS[c.id]={label:c.label,type:c.type,cat:c.cat});
+  (store.chips||[]).forEach(id=>{const L=LABELS[id];if(!L)return;(L.type==='dim'?state.dims:state.sims).add(id);});}
+
+function applyPreset(target,id,clearChips=false){const p=presetById(id);Object.assign(target,p.v);target.presetId=id;
+  if(clearChips&&target.dims){target.dims.clear();target.sims.clear();}}
+
+/* ---------- Healing ---------- */
+function healingAt(t,st=state){const Td=TISSUES[st.tissue].days,u=t/Td;
+  const damage=7*Math.pow(Math.max(0,1-u),1.4);
+  const inflam=8*Math.exp(-t/4)+(st.path==='persistent'?0.5:0);
+  let alarm;
+  if(st.path==='normal')alarm=1+2.5*Math.exp(-t/(0.3*Td));
+  else alarm=3+4*smooth(0,0.8,u)-(st.graded?3.5*smooth(0.7,1.4,u):0);
+  const r=v=>Math.round(clamp(v,0,10)*2)/2;
+  return {damage:r(damage),inflam:r(inflam),alarm:r(alarm)};}
+function tolAt(u){return u<0?80:45+35*smooth(0,1,u);}
+function thrAt(u,st=state){if(u<0)return 72;
+  if(st.path==='normal')return 22+52*smooth(0.1,1.1,u);
+  let v=22+16*smooth(0.05,1.2,u);
+  if(st.graded)v+=26*Math.floor(smooth(0.6,1.4,u)*5)/5;
+  return v;}
+function phaseAt(t,st=state){const Td=TISSUES[st.tissue].days;
+  if(t<5)return 'Inflammation phase: immune cells clean up debris';
+  if(t<21)return 'Proliferation phase: collagen laid down, new blood vessels form';
+  if(t<Td)return 'Remodelling phase: collagen fibres cross-link and realign';
+  return 'Tissue has healed';}
+function fmtTime(d){d=Math.round(d);if(d<14)return d===1?'Day 1':`Day ${d}`;if(d<120)return `Week ${Math.round(d/7)}`;return `Month ${Math.round(d/30.4)}`;}
+const timeMax=()=>TISSUES[state.tissue].days*1.4;
+
+/* ---------- Body scene ---------- */
+function star(cx,cy,r){let d='';for(let i=0;i<8;i++){const a=i*Math.PI/4-Math.PI/2,rr=i%2?r*0.38:r;d+=(i?'L':'M')+(cx+rr*Math.cos(a)).toFixed(1)+' '+(cy+rr*Math.sin(a)).toFixed(1);}return d+'Z';}
+function arc(r,a0,a1){const p=a=>[r*Math.sin(a*Math.PI/180),-r*Math.cos(a*Math.PI/180)];const [x0,y0]=p(a0),[x1,y1]=p(a1);return `M${x0.toFixed(1)} ${y0.toFixed(1)}A${r} ${r} 0 0 1 ${x1.toFixed(1)} ${y1.toFixed(1)}`;}
+const DOG_SHOW=[['dg-ears-down','dg-eyes-shut','dg-zz'],['dg-ears-down','dg-eyes-open'],['dg-ears-up','dg-eyes-open'],['dg-ears-up','dg-eyes-open','dg-mouth','dg-bark']];
+const DOG_TOGGLE=['dg-ears-down','dg-ears-up','dg-eyes-shut','dg-eyes-open','dg-mouth','dg-zz','dg-bark'];
+function dogSVG(){return `<circle class="dg-ring" r="17"/>
+  <path class="dg-ear dg-ears-down" d="M-7 -8 q-9 1 -8 13 q4 1 6 -5z"/>
+  <path class="dg-ear dg-ears-up" d="M-9 -5 l-2 -13 l9 7z M2 -9 l5 -11 l3 11z"/>
+  <circle class="dg-head" r="10"/><ellipse class="dg-head" cx="8" cy="4" rx="7" ry="5"/><circle class="dg-nose" cx="14" cy="2" r="2"/>
+  <path class="dg-eyes-shut dg-line" d="M-2 -2 h5"/><circle class="dg-eyes-open dg-eye" cx="1" cy="-2" r="1.7"/>
+  <path class="dg-mouth dg-line" d="M5 9 q5 4 10 0"/><text class="dg-zz" x="9" y="-11">z z</text>
+  <path class="dg-bark dg-line" d="M19 -7 l5 -3 M20 2 h6 M19 10 l5 3"/>`;}
+function setDog(g,lvl){if(!g||g._lvl===lvl)return;g._lvl=lvl;
+  DOG_TOGGLE.forEach(c=>g.querySelectorAll('.'+c).forEach(e=>e.style.display=DOG_SHOW[lvl].includes(c)?'':'none'));
+  const r=g.querySelector('.dg-ring');if(r)r.style.stroke=`var(--guard${lvl})`;}
+
+function bodySVG(p,compact){
+  const limbs=[['M142 142 Q116 200 108 254 Q100 310 96 362',28],['M258 142 Q284 200 292 254 Q300 310 304 362',28],
+    ['M168 336 Q160 410 162 470 Q164 540 162 604',40],['M232 336 Q240 410 238 470 Q236 540 238 604',40]];
+  const torso='M140 132 C160 122 240 122 260 132 C276 140 280 160 276 190 L262 290 C258 312 262 332 266 352 L134 352 C138 332 142 312 138 290 L124 190 C120 160 124 140 140 132 Z';
+  const solids=`<circle class="solid" cx="200" cy="64" r="36"/><rect class="solid" x="188" y="94" width="24" height="34" rx="10"/><path class="solid" d="${torso}"/>
+    <circle class="solid" cx="95" cy="378" r="15"/><circle class="solid" cx="305" cy="378" r="15"/><ellipse class="solid" cx="154" cy="622" rx="22" ry="11"/><ellipse class="solid" cx="246" cy="622" rx="22" ry="11"/>`;
+  const limbOut=limbs.map(([d,w])=>`<path class="limb" d="${d}" stroke-width="${w+3}"/>`).join('');
+  const limbIn=limbs.map(([d,w])=>`<path class="limb" d="${d}" stroke-width="${w}"/>`).join('');
+  const tears=[[-14,-8],[12,-12],[-10,10],[14,8],[0,-18],[2,16]].map(([dx,dy])=>{const x=238+dx,y=598+dy;return `<path class="tear" d="M${x-5} ${y} l3 -4 l3 4 l3 -4 l2 3"/>`;}).join('');
+  const nervePath='M238 598 C242 540 236 500 236 460 C236 410 226 360 214 330 C208 316 204 308 201 303';
+  const labels=compact?'':`
+    <g aria-hidden="true">
+      <path class="leader" d="M228 52 L318 52 L326 46"/><text class="svg-label" x="330" y="44">The brain</text><text class="svg-sub" x="330" y="60">threat or no threat?</text>
+      <path class="leader" d="M208 200 L326 200"/><text class="svg-label" x="330" y="198">Spinal cord</text><text class="svg-sub" x="330" y="214">CNS, to the brain</text>
+      <path class="leader" d="M216 300 L326 300"/><text class="svg-label" x="330" y="298">The gate</text><text class="svg-sub" x="330" y="314">dorsal horn synapse</text>
+      <path class="leader" d="M244 460 L326 460"/><text class="svg-label" x="330" y="458">The nerve</text><text class="svg-sub" x="330" y="474">PNS: ankle to spine</text>
+      <path class="leader" d="M252 598 L326 598"/><text class="svg-label" x="330" y="596">The sensor</text><text class="svg-sub" x="330" y="612">nociceptor</text>
+      <text class="svg-small" x="290" y="578" text-anchor="middle">guard dog</text>
+      <text class="svg-sub" x="100" y="22" text-anchor="middle" font-weight="700">Volume dial</text>
+      <text class="svg-small" x="70" y="102" text-anchor="middle">quieter</text><text class="svg-small" x="130" y="102" text-anchor="middle">louder</text>
+      <text class="svg-small" x="52" y="117" text-anchor="end">brake</text><text class="svg-small" x="52" y="131" text-anchor="end">boost</text>
+    </g>`;
+  return `<svg viewBox="${compact?'40 0 320 650':'0 0 460 650'}" role="img" aria-label="Body diagram showing a nerve from the ankle to the spinal cord and brain">
+  <defs><radialGradient id="${p}-inf"><stop offset="0" style="stop-color:var(--pain);stop-opacity:.85"/><stop offset="1" style="stop-color:var(--pain);stop-opacity:0"/></radialGradient>
+  <radialGradient id="${p}-glow"><stop offset=".3" style="stop-color:var(--pain);stop-opacity:.9"/><stop offset="1" style="stop-color:var(--pain);stop-opacity:0"/></radialGradient></defs>
+  <g class="fig-out">${limbOut}${solids}</g>
+  <g class="fig-in">${limbIn}${solids}</g>
+  <circle class="inflam" cx="238" cy="598" r="38" style="fill:url(#${p}-inf)" opacity="0"/>
+  <g class="tears">${tears}</g>
+  <circle class="brain-glow" cx="200" cy="58" r="48" style="fill:url(#${p}-glow)" opacity="0"/>
+  <path class="cord" d="M200 84 L200 302"/><path class="cord-core" d="M200 84 L200 302"/>
+  <path class="nerve" d="${nervePath}"/>
+  <path class="flow-pns" d="${nervePath}" stroke-width="0" opacity=".35"/>
+  <path class="flow-cord" d="M203 300 L203 82" stroke-width="0" opacity=".35"/>
+  <path class="ghost p-pns" d="${nervePath}"/><path class="ghost p-asc" d="M203 300 L203 74"/><path class="ghost p-desc" d="M197 76 L197 298"/>
+  <ellipse class="brain-shape" cx="200" cy="56" rx="27" ry="21"/>
+  <path class="gyri" d="M200 37 V75 M180 50 q6 -8 13 -2 M207 48 q7 -6 13 2 M178 63 q7 6 15 0 M207 63 q8 6 15 -1"/>
+  <g class="alarm"><path class="star" d="${star(184,286,7)}"/><path class="star" d="${star(218,312,7)}"/><path class="star" d="${star(182,318,6)}"/></g>
+  <g class="gate"><rect class="gate-bg" x="185" y="290" width="30" height="18" rx="6"/><rect class="leaf leaf-l" x="188" y="297" width="12" height="4" rx="2"/><rect class="leaf leaf-r" x="200" y="297" width="12" height="4" rx="2"/></g>
+  <g class="dial" transform="translate(100 66)">
+    <path class="dial-cool" d="${arc(30,-125,-2)}"/><path class="dial-warm" d="${arc(30,2,125)}"/>
+    <circle class="knob" r="19"/><line class="needle" x1="0" y1="0" x2="0" y2="-16"/>
+  </g>
+  <g aria-hidden="true"><rect class="bb-track" x="58" y="110" width="64" height="7" rx="3.5"/><rect class="bb-brake" x="58" y="110" width="0" height="7" rx="3.5"/>
+    <rect class="bb-track" x="58" y="124" width="64" height="7" rx="3.5"/><rect class="bb-accel" x="58" y="124" width="0" height="7" rx="3.5"/></g>
+  <path class="dial-link" d="M122 60 L172 56"/>
+  <g class="dog" transform="translate(290 548) scale(1.15)">${dogSVG()}</g>
+  <g class="pulses"></g>
+  <g class="sensor" tabindex="${compact?-1:0}" role="button" aria-label="Send a signal from the ankle">
+    <circle class="sensor-hit" cx="238" cy="598" r="24"/><circle class="sensor-ring" cx="238" cy="598" r="11"/><circle class="sensor-dot" cx="238" cy="598" r="5.5"/>
+  </g>
+  <g class="rings">
+    <circle class="ring" data-part="sensor" cx="238" cy="598" r="24"/>
+    <circle class="ring" data-part="gate" cx="200" cy="299" r="26"/>
+    <ellipse class="ring" data-part="cord" cx="200" cy="190" rx="22" ry="120"/>
+    <circle class="ring" data-part="brain" cx="200" cy="58" r="42"/>
+    <ellipse class="ring" data-part="dial" cx="92" cy="86" rx="62" ry="62"/>
+    <circle class="ring" data-part="alarm" cx="200" cy="300" r="34"/>
+    <circle class="ring" data-part="dog" cx="290" cy="548" r="28"/>
+  </g>
+  ${labels}
+  </svg>`;
+}
+
+class BodyScene{
+  constructor(host,getState,opts={}){
+    this.host=host;this.getState=getState;this.compact=!!opts.compact;
+    host.innerHTML=bodySVG(opts.prefix||('s'+Math.random().toString(36).slice(2,7)),this.compact);
+    const q=s=>host.querySelector(s);
+    this.paths={pns:q('.p-pns'),asc:q('.p-asc'),desc:q('.p-desc')};
+    this.len={};for(const k in this.paths)this.len[k]=this.paths[k].getTotalLength();
+    this.layer=q('.pulses');
+    this.el={inflam:q('.inflam'),glow:q('.brain-glow'),needle:q('.needle'),leafL:q('.leaf-l'),leafR:q('.leaf-r'),bBar:q('.bb-brake'),aBar:q('.bb-accel'),dog:q('.dog'),
+      stars:[...host.querySelectorAll('.star')],tears:[...host.querySelectorAll('.tear')],flowP:q('.flow-pns'),flowC:q('.flow-cord'),rings:[...host.querySelectorAll('.ring')]};
+    this.pulses=[];this.acc=Math.random();this.tacc=Math.random();this.bacc=0;this.aacc=0;this.flash=0;this.t=0;
+    this.disp={net:0,b:CONFIG.brakeBase,a:0,P:0,gate:0,alarm:0,inflam:0};
+    if(!this.compact){const s=q('.sensor');s.addEventListener('click',()=>this.poke());s.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();this.poke();}});}
+  }
+  visible(){return this.host.offsetParent!==null;}
+  highlight(part){this.el.rings.forEach(r=>r.classList.toggle('on',r.dataset.part===part));}
+  dot(cls,r){const c=document.createElementNS(SVGNS,'circle');c.setAttribute('class',cls);c.setAttribute('r',r.toFixed(2));this.layer.appendChild(c);return c;}
+  spawnSensor(amp){const r=2.4+2.2*Math.pow(Math.min(amp,3),.7);this.pulses.push({k:'pns',amp,c:this.dot('pulse-s',r),t:0,speed:300,r});}
+  spawnTouch(){this.pulses.push({k:'pns',touch:true,c:this.dot('pulse-t',3),t:0,speed:340,r:3});}
+  poke(){const m=painModel(this.getState());if(reduceMotion){this.flash=Math.min(1,this.flash+0.4);return;}
+    for(let i=0;i<5;i++)setTimeout(()=>this.spawnSensor((m.N*m.S+1.1)*(0.75+0.5*Math.random())),i*110);}
+  step(dt){
+    const s=this.getState(),m=painModel(s);this.t+=dt;const k=Math.min(1,dt*4),d=this.disp;
+    const net=clamp(m.a-(m.b-CONFIG.brakeBase),-1,1);
+    d.net+=(net-d.net)*k;d.b+=(m.b-d.b)*k;d.a+=(m.a-d.a)*k;d.P+=(m.P-d.P)*Math.min(1,dt*3);
+    d.gate+=(clamp(m.T/2.5,0,1)-d.gate)*k;d.alarm+=(m.alarm-d.alarm)*k;d.inflam+=(s.inflam-d.inflam)*k;
+    if(!reduceMotion){
+      this.acc+=dt*(0.5+1.1*m.N);while(this.acc>=1){this.acc-=1;if(this.pulses.length<90)this.spawnSensor(m.N*m.S*(0.55+0.9*Math.random()));}
+      this.tacc+=dt*(0.25+0.2*m.M);while(this.tacc>=1){this.tacc-=1;if(this.pulses.length<90)this.spawnTouch();}
+      this.bacc+=dt*3*m.b;while(this.bacc>=1){this.bacc-=1;this.pulses.push({k:'desc',c:this.dot('pulse-cool',2.6),t:0,speed:150,r:2.6});}
+      this.aacc+=dt*4*m.a;while(this.aacc>=1){this.aacc-=1;this.pulses.push({k:'desc',c:this.dot('pulse-warm',2.6),t:0,speed:150,r:2.6});}
+      const keep=[];
+      for(const p of this.pulses){
+        if(p.dying!==undefined){p.dying+=dt;const f=1-p.dying/0.5;if(f<=0){p.c.remove();continue;}p.c.setAttribute('r',(p.r*f).toFixed(2));p.c.setAttribute('opacity',f.toFixed(2));keep.push(p);continue;}
+        p.t+=dt*p.speed/this.len[p.k];
+        if(p.t>=1){
+          if(p.k==='pns'){
+            let a2=-1;
+            if(p.touch){if(m.T>0&&Math.random()<clamp(m.w*2.5,0,1))a2=Math.max(0.3,(m.NS-m.G)*m.D*0.6);}
+            else if(p.amp>m.G)a2=(p.amp-m.G)*m.D;
+            if(a2>0){p.c.remove();const r=2.4+1.7*Math.sqrt(clamp(a2,0.05,4));keep.push({k:'asc',amp:a2,c:this.dot('pulse-a',r),t:0,speed:230,r});continue;}
+            p.dying=0;keep.push(p);continue;}
+          if(p.k==='asc')this.flash=Math.min(1,this.flash+0.12+0.08*p.amp);
+          p.c.remove();continue;}
+        const pt=this.paths[p.k].getPointAtLength(p.t*this.len[p.k]);p.c.setAttribute('cx',pt.x.toFixed(1));p.c.setAttribute('cy',pt.y.toFixed(1));keep.push(p);
+      }
+      this.pulses=keep;
+    }
+    this.flash=Math.max(0,this.flash-dt*1.4);
+    this.render(s,m);
+  }
+  render(s,m){const d=this.disp,e=this.el;
+    e.needle.setAttribute('transform',`rotate(${(d.net*130).toFixed(1)})`);
+    e.bBar.setAttribute('width',(64*d.b).toFixed(1));e.aBar.setAttribute('width',(64*d.a).toFixed(1));
+    setDog(e.dog,guardLevel(s));
+    const gap=d.gate*7;e.leafL.setAttribute('transform',`translate(${-gap.toFixed(1)} 0)`);e.leafR.setAttribute('transform',`translate(${gap.toFixed(1)} 0)`);
+    const tw=1+0.5*Math.sin(this.t*4);
+    e.stars.forEach((st,i)=>st.setAttribute('opacity',(0.12+0.85*(d.alarm/10)*(reduceMotion?1:(0.75+0.25*Math.sin(this.t*3+i*2)))).toFixed(2)));
+    e.inflam.setAttribute('opacity',(d.inflam/10*0.85*(reduceMotion?1:(0.9+0.1*tw))).toFixed(2));
+    const shown=Math.round(s.damage*6/10);e.tears.forEach((t,i)=>t.setAttribute('opacity',i<shown?1:0));
+    e.glow.setAttribute('opacity',clamp(0.04+0.75*(d.P/10)+0.35*this.flash,0,1).toFixed(2));
+    e.flowP.setAttribute('stroke-width',(reduceMotion?1+2.5*Math.min(m.N*m.S,3):0.8*Math.min(m.N*m.S,3)).toFixed(2));
+    e.flowC.setAttribute('stroke-width',(reduceMotion?m.T*m.D*2:0.6*Math.min(m.T*m.D,4)).toFixed(2));
+  }
+}
+
+/* ---------- Gate zoom scene ---------- */
+function astroSVG(cx,cy){let a='';for(let i=0;i<6;i++){const an=i*Math.PI/3+0.3;a+=`<path class="astro-arm" d="M${cx} ${cy} q${(14*Math.cos(an+0.4)).toFixed(1)} ${(14*Math.sin(an+0.4)).toFixed(1)} ${(26*Math.cos(an)).toFixed(1)} ${(26*Math.sin(an)).toFixed(1)}"/>`;}
+  return `<g class="astro-g">${a}<circle class="astro" cx="${cx}" cy="${cy}" r="9"/></g>`;}
+function microSVG(cx,cy){let a='';for(let i=0;i<8;i++){const an=i*Math.PI/4+0.2,f=v=>v.toFixed(1);
+    const x1=cx+17*Math.cos(an),y1=cy+17*Math.sin(an),x2=cx+29*Math.cos(an+0.28),y2=cy+29*Math.sin(an+0.28),x3=cx+27*Math.cos(an-0.28),y3=cy+27*Math.sin(an-0.28);
+    a+=`<path class="mg-arm" d="M${cx} ${cy}L${f(x1)} ${f(y1)}L${f(x2)} ${f(y2)}M${f(x1)} ${f(y1)}L${f(x3)} ${f(y3)}"/>`;}
+  return `<g class="mg-g">${a}<circle class="mg-body" cx="${cx}" cy="${cy}" r="8"/></g>`;}
+function zoomSVG(){
+  return `<svg viewBox="0 0 460 410" role="img" aria-label="Close-up of the gate in the spinal cord: danger and touch nerves, glial cells, and the brain's brake and accelerator">
+  <path class="z-horn" d="M60 120 C120 60 380 50 430 110 C470 170 450 330 380 370 C300 400 140 395 80 340 C30 290 20 170 60 120 Z"/>
+  <g class="astros">${astroSVG(170,150)}${astroSVG(198,360)}</g>
+  <g class="micros">${microSVG(404,352)}</g>
+  <g class="cytos"></g>
+  <path class="z-axon" d="M10 228 C110 228 180 230 236 236"/><circle class="z-bulb" cx="250" cy="236" r="16"/>
+  <path class="z-touchax" d="M10 312 C110 312 200 296 256 264"/><circle class="z-tbulb" cx="266" cy="258" r="9"/>
+  <path class="z-up" d="M300 218 C300 160 306 100 318 24"/><circle class="z-cell" cx="300" cy="236" r="18"/>
+  <path class="z-brake" d="M452 124 C420 160 372 192 330 212"/><circle class="z-brake-term" cx="326" cy="214" r="7"/>
+  <path class="z-accel" d="M456 206 C424 222 380 240 338 246"/><circle class="z-accel-term" cx="334" cy="247" r="7"/>
+  <path class="ghost zp-in" d="M10 228 C110 228 180 230 236 236"/><path class="ghost zp-touch" d="M10 312 C110 312 200 296 256 264"/><path class="ghost zp-up" d="M300 218 C300 160 306 100 318 24"/>
+  <path class="ghost zp-brake" d="M452 124 C420 160 372 192 330 212"/><path class="ghost zp-accel" d="M456 206 C424 222 380 240 338 246"/>
+  <g class="zpulses"></g>
+  <g class="rings"><circle class="ring" data-part="alarm" cx="170" cy="150" r="40"/><circle class="ring" data-part="gate" cx="282" cy="246" r="44"/><ellipse class="ring" data-part="dial" cx="396" cy="196" rx="66" ry="64"/><circle class="ring" data-part="touch" cx="60" cy="312" r="30"/></g>
+  <g aria-hidden="true">
+    <text class="svg-label" x="14" y="200">Danger nerve</text><text class="svg-sub" x="14" y="214">from the sensor</text>
+    <text class="svg-label" x="14" y="340">Touch nerve</text><text class="svg-sub" x="14" y="354">touch and movement</text>
+    <text class="svg-label" x="300" y="286" text-anchor="middle">The gate</text><text class="svg-sub" x="300" y="300" text-anchor="middle">hears danger and touch</text>
+    <text class="svg-label" x="330" y="30">To the brain</text>
+    <text class="svg-label" x="446" y="96" text-anchor="end">Brake</text><text class="svg-sub" x="446" y="110" text-anchor="end">GABA, endorphins</text>
+    <text class="svg-label" x="450" y="270" text-anchor="end">Accelerator</text><text class="svg-sub" x="450" y="284" text-anchor="end">adrenaline, cortisol</text>
+    <text class="svg-label" x="170" y="104" text-anchor="middle">Fire alarm</text><text class="svg-sub" x="170" y="118" text-anchor="middle">astrocytes</text>
+    <text class="svg-label" x="404" y="316" text-anchor="middle">Microglia</text>
+    <circle class="pulse-s" cx="20" cy="396" r="4"/><text class="svg-small" x="30" y="400">danger signal</text>
+    <circle class="pulse-t" cx="116" cy="396" r="4"/><text class="svg-small" x="126" y="400">touch signal</text>
+    <circle class="cyto" cx="206" cy="396" r="3.5"/><text class="svg-small" x="216" y="400">cytokines</text>
+    <circle class="pulse-cool" cx="282" cy="396" r="4"/><text class="svg-small" x="292" y="400">brake</text>
+    <circle class="pulse-warm" cx="336" cy="396" r="4"/><text class="svg-small" x="346" y="400">accelerator</text>
+  </g></svg>`;
+}
+class ZoomScene{
+  constructor(host,getState){this.host=host;this.getState=getState;host.innerHTML=zoomSVG();const q=s=>host.querySelector(s);
+    this.paths={in:q('.zp-in'),touch:q('.zp-touch'),up:q('.zp-up'),brake:q('.zp-brake'),accel:q('.zp-accel')};
+    this.len={};for(const k in this.paths)this.len[k]=this.paths[k].getTotalLength();
+    this.layer=q('.zpulses');this.cytoLayer=q('.cytos');this.glia=[...host.querySelectorAll('.astro-g,.mg-g')];this.rings=[...host.querySelectorAll('.ring')];
+    this.items=[];this.acc=0;this.tacc=0;this.bacc=0;this.aacc=0;this.t=0;this.cytos=[];
+    const centres=[[170,150],[198,360],[404,352]];
+    for(let i=0;i<24;i++){const c=document.createElementNS(SVGNS,'circle');c.setAttribute('class','cyto');c.setAttribute('r','3.2');this.cytoLayer.appendChild(c);
+      const [cx,cy]=centres[i%3];this.cytos.push({c,cx,cy,a:Math.random()*6.28,rad:30+Math.random()*22,sp:0.3+Math.random()*0.5});}}
+  visible(){return this.host.offsetParent!==null;}
+  highlight(part){this.rings.forEach(r=>r.classList.toggle('on',r.dataset.part===part));}
+  dot(cls,r){const c=document.createElementNS(SVGNS,'circle');c.setAttribute('class',cls);c.setAttribute('r',r.toFixed(2));this.layer.appendChild(c);return c;}
+  nt(cls,x0,y0,x1,y1,life,r=3){const c=this.dot(cls,r);c.setAttribute('cx',x0);c.setAttribute('cy',y0);return {k:'nt',c,x0,y0,x1,y1,life,t:0};}
+  poke(){const m=painModel(this.getState());if(reduceMotion)return;for(let i=0;i<5;i++)setTimeout(()=>this.items.push({k:'in',amp:(m.N*m.S+1.1)*(0.75+0.5*Math.random()),t:0,speed:220,c:this.dot('pulse-s',6)}),i*110);}
+  step(dt){const s=this.getState(),m=painModel(s);this.t+=dt;
+    if(!reduceMotion){
+      this.acc+=dt*(0.5+1.1*m.N);while(this.acc>=1){this.acc-=1;const amp=m.N*m.S*(0.55+0.9*Math.random());this.items.push({k:'in',amp,t:0,speed:220,c:this.dot('pulse-s',3+2.4*Math.pow(Math.min(amp,3),.7))});}
+      this.tacc+=dt*(0.25+0.2*m.M);while(this.tacc>=1){this.tacc-=1;this.items.push({k:'touch',t:0,speed:260,c:this.dot('pulse-t',3.5)});}
+      this.bacc+=dt*3*m.b;while(this.bacc>=1){this.bacc-=1;this.items.push({k:'brake',t:0,speed:120,c:this.dot('pulse-cool',3.4)});}
+      this.aacc+=dt*4*m.a;while(this.aacc>=1){this.aacc-=1;this.items.push({k:'accel',t:0,speed:120,c:this.dot('pulse-warm',3.4)});}
+      const keep=[],fresh=[];
+      for(const it of this.items){
+        if(it.k==='nt'){it.t+=dt;const f=it.t/it.life;if(f>=1){it.c.remove();continue;}it.c.setAttribute('cx',(it.x0+(it.x1-it.x0)*f).toFixed(1));it.c.setAttribute('cy',(it.y0+(it.y1-it.y0)*f).toFixed(1));it.c.setAttribute('opacity',(1-f*0.7).toFixed(2));keep.push(it);continue;}
+        it.t+=dt*it.speed/this.len[it.k];
+        if(it.t>=1){it.c.remove();
+          if(it.k==='in'){const n=Math.min(9,Math.round(it.amp*3));for(let i=0;i<n;i++){const y=228+Math.random()*16;fresh.push(this.nt('nt',264,y,284,y+(Math.random()*8-4),0.45));}
+            if(it.amp>m.G){const a2=(it.amp-m.G)*m.D;keep.push({k:'up',amp:a2,t:0,speed:180,c:this.dot('pulse-a',3+2*Math.sqrt(clamp(a2,0,4)))});}}
+          else if(it.k==='touch'){const conv=m.T>0&&Math.random()<clamp(m.w*2.5,0,1);for(let i=0;i<3;i++)fresh.push(this.nt(conv?'nt':'nt-t',272,256,284,246+Math.random()*8,0.4,2.4));
+            if(conv)keep.push({k:'up',amp:0.6,t:0,speed:180,c:this.dot('pulse-a',4)});}
+          else if(it.k==='brake'||it.k==='accel'){const cool=it.k==='brake',x=cool?322:330,y=cool?218:244;for(let i=0;i<4;i++)fresh.push(this.nt(cool?'pulse-cool':'pulse-warm',x,y,306+Math.random()*10,226+Math.random()*16,0.6,2.4));}
+          continue;}
+        const pt=this.paths[it.k].getPointAtLength(it.t*this.len[it.k]);it.c.setAttribute('cx',pt.x.toFixed(1));it.c.setAttribute('cy',pt.y.toFixed(1));keep.push(it);}
+      this.items=keep.concat(fresh);
+    }
+    const a=m.alarm/10,cy=clamp(Math.round(m.alarm*1.6+s.inflam*0.8),0,24);
+    this.glia.forEach((g,i)=>g.setAttribute('opacity',(0.18+0.82*a*(reduceMotion?1:(0.8+0.2*Math.sin(this.t*3+i)))).toFixed(2)));
+    this.cytos.forEach((c,i)=>{if(i<cy){c.a+=(reduceMotion?0:dt*c.sp);c.c.setAttribute('cx',(c.cx+c.rad*Math.cos(c.a)).toFixed(1));c.c.setAttribute('cy',(c.cy+c.rad*0.7*Math.sin(c.a)).toFixed(1));c.c.setAttribute('opacity','0.85');}else c.c.setAttribute('opacity','0');});
+  }
+}
+
+/* ---------- Ankle zoom scene ---------- */
+const AK_BR=['M150 170 C120 150 100 130 80 100','M150 170 C120 170 90 175 60 170','M150 170 C125 190 105 215 85 240','M150 170 C150 140 140 110 130 80','M150 170 C160 200 150 230 140 258'];
+const AK_TIPS=[[80,100],[60,170],[85,240],[130,80],[140,258]];
+const AK_SLOTS=[[100,130],[205,128],[48,214],[192,212],[118,262],[232,160],[40,128],[170,100],[240,240],[255,268],[228,98],[262,200]];
+const AK_TEARS=[[70,330],[160,330],[250,342],[100,342],[220,354],[130,354]];
+function immuneSVG(i,x,y){const t=i%3;
+  if(t===0)return `<g class="imm imm-mast"><circle class="imm-spikes" cx="${x}" cy="${y}" r="11.5"/><circle cx="${x}" cy="${y}" r="9"/></g>`;
+  if(t===1)return `<g class="imm imm-neut"><circle cx="${x-4}" cy="${y-2}" r="5.5"/><circle cx="${x+4}" cy="${y-2}" r="5.5"/><circle cx="${x}" cy="${y+4}" r="5.5"/></g>`;
+  return `<g class="imm imm-t"><circle cx="${x}" cy="${y}" r="8.5"/></g>`;}
+function ankleSVG(){
+  const fib=y=>`<path class="ak-fibre" d="M24 ${y} q20 -6 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t26 0"/>`;
+  return `<svg viewBox="0 0 460 410" role="img" aria-label="Close-up of the ankle: the danger nerve ending with immune cells, a touch sensor and the guard dog">
+  <rect class="ak-tissue" x="8" y="36" width="304" height="336" rx="24"/>
+  <text class="svg-sub" x="24" y="60">Ankle tissue</text>
+  ${fib(330)}${fib(342)}${fib(354)}
+  <g class="ak-tears">${AK_TEARS.map(([x,y])=>`<path class="tear" d="M${x-6} ${y} l3 -5 l3 5 l3 -5 l3 4"/>`).join('')}</g>
+  <g class="chems"></g>
+  ${AK_BR.map(d=>`<path class="ak-branch" d="${d}"/>`).join('')}
+  ${AK_TIPS.map(([x,y])=>`<circle class="ak-tip" cx="${x}" cy="${y}" r="4.5"/>`).join('')}
+  <path class="z-axon" d="M150 170 C220 170 300 180 460 190"/>
+  <ellipse class="ak-capsule" cx="80" cy="292" rx="15" ry="9"/><path class="z-touchax" d="M95 292 C200 292 320 300 460 302"/>
+  <g class="imms">${AK_SLOTS.map(([x,y],i)=>immuneSVG(i,x,y)).join('')}</g>
+  ${AK_BR.map((d,i)=>`<path class="ghost akb-${i}" d="${d}"/>`).join('')}
+  <path class="ghost ak-ax" d="M150 170 C220 170 300 180 460 190"/><path class="ghost ak-touch" d="M95 292 C200 292 320 300 460 302"/>
+  <g class="apulses"></g>
+  <g class="dog" transform="translate(378 80) scale(2.2)">${dogSVG()}</g>
+  <g class="rings"><circle class="ring" data-part="dog" cx="378" cy="80" r="50"/><circle class="ring" data-part="immune" cx="150" cy="172" r="112"/></g>
+  <g aria-hidden="true">
+    <text class="svg-label ak-dog-label" x="378" y="148" text-anchor="middle">Guard dog: Asleep</text><text class="svg-sub" x="378" y="162" text-anchor="middle">how touchy the sensor is</text>
+    <text class="svg-label" x="170" y="64">The sensor</text><text class="svg-sub" x="170" y="78">danger nerve ending</text>
+    <text class="svg-sub" x="452" y="214" text-anchor="end">to the spinal cord</text>
+    <text class="svg-label" x="40" y="276">Touch sensor</text>
+    <text class="svg-sub" x="452" y="326" text-anchor="end">touch nerve to the spinal cord</text>
+    <circle style="fill:var(--cns)" cx="20" cy="396" r="5"/><text class="svg-small" x="30" y="400">mast cell</text>
+    <circle style="fill:var(--pain)" cx="100" cy="396" r="5"/><text class="svg-small" x="110" y="400">neutrophil</text>
+    <circle style="fill:var(--cool)" cx="182" cy="396" r="5"/><text class="svg-small" x="192" y="400">T cell</text>
+    <circle class="ak-chem" cx="246" cy="396" r="3"/><text class="svg-small" x="256" y="400">chemical messengers</text>
+  </g></svg>`;
+}
+class AnkleScene{
+  constructor(host,getState){this.host=host;this.getState=getState;host.innerHTML=ankleSVG();const q=s=>host.querySelector(s);
+    this.br=AK_BR.map((_,i)=>q('.akb-'+i));this.brLen=this.br.map(p=>p.getTotalLength());
+    this.paths={ax:q('.ak-ax'),touch:q('.ak-touch')};this.len={ax:this.paths.ax.getTotalLength(),touch:this.paths.touch.getTotalLength()};
+    this.layer=q('.apulses');this.imm=[...host.querySelectorAll('.imm')];this.tears=[...host.querySelectorAll('.ak-tears .tear')];
+    this.dog=q('.dog');this.dogLabel=q('.ak-dog-label');this.rings=[...host.querySelectorAll('.ring')];
+    this.items=[];this.acc=0;this.tacc=0;this.t=0;this.chems=[];const cl=q('.chems');
+    for(let i=0;i<30;i++){const c=document.createElementNS(SVGNS,'circle');c.setAttribute('class','ak-chem');c.setAttribute('r','2.6');cl.appendChild(c);
+      const a=Math.random()*6.28,r=20+Math.random()*90;this.chems.push({c,x:clamp(150+r*Math.cos(a),24,296),y:clamp(170+r*0.9*Math.sin(a),50,310),ph:Math.random()*6.28});}}
+  visible(){return this.host.offsetParent!==null;}
+  highlight(part){this.rings.forEach(r=>r.classList.toggle('on',r.dataset.part===part));}
+  dot(cls,r){const c=document.createElementNS(SVGNS,'circle');c.setAttribute('class',cls);c.setAttribute('r',r.toFixed(2));this.layer.appendChild(c);return c;}
+  spawn(amp){const i=Math.floor(Math.random()*AK_BR.length);this.items.push({k:'br',i,amp,t:0,speed:150,c:this.dot('pulse-s',3+2.2*Math.pow(Math.min(amp,3),.7))});}
+  poke(){if(reduceMotion)return;const m=painModel(this.getState());for(let i=0;i<5;i++)setTimeout(()=>this.spawn((m.N*m.S+1.1)*(0.75+0.5*Math.random())),i*110);}
+  step(dt){const s=this.getState(),m=painModel(s);this.t+=dt;
+    if(!reduceMotion){
+      this.acc+=dt*(0.5+1.1*m.N);while(this.acc>=1){this.acc-=1;this.spawn(m.N*m.S*(0.55+0.9*Math.random()));}
+      this.tacc+=dt*(0.25+0.2*m.M);while(this.tacc>=1){this.tacc-=1;this.items.push({k:'touch',t:0,speed:240,c:this.dot('pulse-t',3.5)});}
+      const keep=[];
+      for(const it of this.items){
+        if(it.k==='br'){it.t+=dt*it.speed/this.brLen[it.i];if(it.t>=1){it.k='ax';it.t=0;}else{const pt=this.br[it.i].getPointAtLength((1-it.t)*this.brLen[it.i]);it.c.setAttribute('cx',pt.x.toFixed(1));it.c.setAttribute('cy',pt.y.toFixed(1));keep.push(it);continue;}}
+        it.t+=dt*it.speed/this.len[it.k];if(it.t>=1){it.c.remove();continue;}
+        const pt=this.paths[it.k].getPointAtLength(it.t*this.len[it.k]);it.c.setAttribute('cx',pt.x.toFixed(1));it.c.setAttribute('cy',pt.y.toFixed(1));keep.push(it);}
+      this.items=keep;
+    }
+    const n=clamp(Math.round(0.9*s.inflam+0.4*s.damage),0,12);
+    this.imm.forEach((g,i)=>{g.setAttribute('opacity',i<n?'1':'0');if(i<n&&!reduceMotion)g.setAttribute('transform',`translate(${(2*Math.sin(this.t*1.3+i)).toFixed(1)} ${(2*Math.cos(this.t*1.1+i*2)).toFixed(1)})`);});
+    const nc=clamp(Math.round(s.inflam*3),0,30);
+    this.chems.forEach((c,i)=>{if(i<nc){const dx=reduceMotion?0:4*Math.sin(this.t*0.8+c.ph),dy=reduceMotion?0:4*Math.cos(this.t*0.7+c.ph);c.c.setAttribute('cx',(c.x+dx).toFixed(1));c.c.setAttribute('cy',(c.y+dy).toFixed(1));c.c.setAttribute('opacity','0.9');}else c.c.setAttribute('opacity','0');});
+    const lvl=guardLevel(s);setDog(this.dog,lvl);const lab='Guard dog: '+GUARD[lvl];if(this.dogLabel.textContent!==lab)this.dogLabel.textContent=lab;
+    const shown=Math.round(s.damage*6/10);this.tears.forEach((t,i)=>t.setAttribute('opacity',i<shown?1:0));
+  }
+}
+
+/* ---------- Meters ---------- */
+const meters=[];
+function makeMeters(host,horizontal){host.classList.toggle('h',!!horizontal);
+  host.innerHTML=['damage','pain'].map(k=>`<div class="meter m-${k}"><div class="meter-track" role="meter" aria-valuemin="0" aria-valuemax="10" aria-label="${k==='damage'?'Tissue damage':'Pain I feel'}"><div class="meter-fill"></div></div><div class="meter-num"><span>0</span><small>/10</small></div><div class="meter-label">${k==='damage'?'Tissue damage':'Pain I feel'}</div></div>`).join('');
+  const obj={host,horizontal:!!horizontal,cur:{damage:0,pain:0},target:{damage:0,pain:0},
+    els:{damage:{fill:host.querySelector('.m-damage .meter-fill'),num:host.querySelector('.m-damage .meter-num span'),track:host.querySelector('.m-damage .meter-track')},
+         pain:{fill:host.querySelector('.m-pain .meter-fill'),num:host.querySelector('.m-pain .meter-num span'),track:host.querySelector('.m-pain .meter-track')}},
+    set(d,p){this.target.damage=d;this.target.pain=p;}};
+  meters.push(obj);return obj;}
+function stepMeters(dt){for(const mt of meters){if(mt.host.offsetParent===null)continue;
+  for(const k of ['damage','pain']){const t=mt.target[k];mt.cur[k]+=(t-mt.cur[k])*(reduceMotion?1:Math.min(1,dt*5));
+    const v=mt.cur[k],pct=(v*10).toFixed(1)+'%',e=mt.els[k];
+    if(mt.horizontal)e.fill.style.width=pct;else e.fill.style.height=pct;
+    const txt=(Math.round(t*10)/10).toFixed(1).replace('.0','');if(e.num.textContent!==txt){e.num.textContent=txt;e.track.setAttribute('aria-valuenow',txt);}}}}
+
+/* ---------- Explanations ---------- */
+const joinList=a=>a.length<2?a.join(''):a.slice(0,-1).join(', ')+' and '+a[a.length-1];
+function explain(s,m){const P=m.P,d=s.damage;
+  const exNote=(s.ex||0)>0.2?' Exercise has released your body’s own pain relievers, so the brake is stronger for a while.':'';
+  if(P<0.5&&m.T<=0&&m.pred===0)return 'Signals are too quiet to pass the gate, so the brain has nothing to protect. No pain.'+exNote;
+  if(m.pred>0.5&&m.T<0.6)return 'Almost no signal is getting through, but the brain predicts danger and creates pain to protect you. This pain is real.';
+  if(m.w>=0.15&&((s.touch||0)+s.load)>=4&&d<=2)return 'The fire alarm at the gate has made it read touch and movement as danger. Gentle touch can hurt with no damage at all.'+exNote;
+  if(P<0.6)return 'Some signal gets through, but the brake is on and the volume is turned right down.'+exNote;
+  if(d>=4&&P<=d-2.5)return `There is real damage, but ${m.b>0.6?'feeling safe and focused elsewhere has put the brake on':'the brain judges the situation as fairly safe'}. Pain is lower than the damage.`+exNote;
+  if(P>=d+2.5){const up=[];if(guardLevel(s)>=2)up.push('the guard dog at the ankle is awake');if(m.alarm>=5)up.push('the fire alarm has made the gate more sensitive');if(m.a>0.2)up.push('worry and stress are pressing the accelerator');if(m.b<0.38)up.push('the brake has weakened');
+    return `Damage is ${d<=2?'low':'moderate'}, but ${joinList(up.length?up:['the system is on high alert'])}. Pain is higher than the damage.`+exNote;}
+  if(d>=4)return (m.a>0.2?'There is real damage, and worry is pressing the accelerator on top of it.':'Pain roughly matches the damage right now. Here pain does a useful job: protecting a hurt ankle while it heals.')+exNote;
+  return 'Pain and damage are both low to moderate. Try a brain slider: it changes pain without changing the damage.'+exNote;}
+const brakeText=m=>m.b>0.6?'Strong':m.b>=0.38?'Normal':'Weak';
+const accelText=m=>m.a<0.05?'Off':m.a<0.35?'On':'Pressed hard';
+const FIRE=[{n:'No rating',c:'var(--fire0)',t:'Relaxed. Normal everyday protection.'},{n:'Moderate',c:'#3A9A47',t:'Some protection. Keep moving and plan ahead.'},
+  {n:'High',c:'#E8B400',t:'Protection is up. Be ready to adjust what you do.'},{n:'Extreme',c:'#E46F1B',t:'Strong protection. Everyday things may hurt.'},
+  {n:'Catastrophic',c:'#A3221A',t:'Full alarm. The system protects at all costs.'}];
+function fireLevel(m){const sc=clamp(0.5*m.P/10+0.3*(m.th+1)/2+0.2*m.alarm/10,0,1);return {sc,lvl:sc<0.25?0:sc<0.45?1:sc<0.65?2:sc<0.82?3:4};}
+function buildGauge(){const svg=$('#gauge'),cx=120,cy=112,r=96,ri=66;const pt=(rr,deg)=>[cx+rr*Math.cos(deg*Math.PI/180),cy+rr*Math.sin(deg*Math.PI/180)];
+  let h='';FIRE.forEach((f,i)=>{const a0=180+36*i+0.8,a1=180+36*(i+1)-0.8;const [x0,y0]=pt(r,a0),[x1,y1]=pt(r,a1),[x2,y2]=pt(ri,a1),[x3,y3]=pt(ri,a0);
+    h+=`<path class="g-seg" data-lvl="${i}" d="M${x0.toFixed(1)} ${y0.toFixed(1)}A${r} ${r} 0 0 1 ${x1.toFixed(1)} ${y1.toFixed(1)}L${x2.toFixed(1)} ${y2.toFixed(1)}A${ri} ${ri} 0 0 0 ${x3.toFixed(1)} ${y3.toFixed(1)}Z" style="fill:${f.c}"/>`;});
+  h+=`<g class="g-needle" style="transform-origin:${cx}px ${cy}px"><line x1="${cx}" y1="${cy}" x2="${cx-84}" y2="${cy}"/><circle cx="${cx}" cy="${cy}" r="7"/></g>`;svg.innerHTML=h;}
+function updateGauge(m){const {sc,lvl}=fireLevel(m);$('#gauge .g-needle').style.transform=`rotate(${(sc*180).toFixed(1)}deg)`;
+  $$('#gauge .g-seg').forEach(p=>p.classList.toggle('dim',+p.dataset.lvl!==lvl));$('#g-sw').style.background=FIRE[lvl].c;$('#g-name').textContent=FIRE[lvl].n;$('#g-text').textContent=FIRE[lvl].t;}
+const CHEM={down:[
+  {n:'Endorphins and enkephalins',d:'Your own opioids. Released by exercise.',on:(s,m)=>s.ex>0.05||s.sims.has('dial:3')},
+  {n:'Endocannabinoids',d:'Released by exercise. They also calm inflammation.',on:(s,m)=>s.ex>0.05||s.sims.has('dial:3')},
+  {n:'Oxytocin',d:'Released by connection and trusted company.',on:(s,m)=>s.sims.has('dial:6')||s.sims.has('s:people:0')||s.sims.has('s:people:1')},
+  {n:'GABA and glycine at the gate',d:'The brake’s messengers. More when you feel safe.',on:(s,m)=>m.b>0.55}],
+ up:[
+  {n:'Adrenaline and noradrenaline',d:'Released by threat and fear.',on:(s,m)=>m.th>0.3},
+  {n:'Cortisol, when stress lasts',d:'Ongoing stress and poor sleep shift the body toward inflammation.',on:(s,m)=>s.stress>=6&&!s.sims.has('dial:1')},
+  {n:'Less GABA and glycine',d:'Microglia and threat weaken the brake.',on:(s,m)=>m.b<0.38},
+  {n:'Cytokines',d:'Immune messengers that wake the guard dog and the fire alarm.',on:(s,m)=>s.inflam>=5||m.alarm>=5}]};
+function renderChem(m){['down','up'].forEach(k=>{const html=CHEM[k].map(c=>{const on=c.on(state,m);return `<li class="${on?'on':''}"><span class="cdot"></span><span><strong>${c.n}</strong>${on?' <span class="active">Active now</span>':''}<br><span class="muted">${c.d}</span></span></li>`;}).join('');
+  const el=$('#chem-'+k);if(el.innerHTML!==html)el.innerHTML=html;});}
+
+/* ---------- Controls ---------- */
+const CONTROLS=[
+  {group:'Body',color:'var(--damage)',items:[
+    {k:'damage',label:'Tissue damage',sub:'How much tissue is actually hurt',step:0.5},
+    {k:'load',label:'Load right now',sub:'Standing, walking, stairs, hopping',step:0.5},
+    {k:'touch',label:'Touch and pressure',sub:'A sock, a bedsheet, a hand, a dog’s paw',step:0.5},
+    {k:'inflam',label:'Inflammation',sub:'Immune cells at the ankle wake the guard dog',step:0.5}]},
+  {group:'Nervous system',color:'var(--pns)',items:[
+    {k:'alarm',label:'Fire alarm',sub:'Microglia and astrocytes at the gate',step:0.5},
+    {k:'time',label:'Time since injury',sub:'Follows the healing curve for a ligament',time:true}]},
+  {group:'Brain',color:'var(--cns)',items:[
+    {k:'worst',label:'Worst-case thinking',sub:'Also called catastrophising',step:0.5},
+    {k:'stress',label:'Stress and poor sleep',step:0.5},
+    {k:'understanding',label:'Understanding of pain',step:0.5},
+    {k:'focus',label:'Attention',ends:['Absorbed elsewhere','Focused on pain'],step:0.5}],chips:true}
+];
+function buildControls(){const host=$('#controls');
+  host.innerHTML=CONTROLS.map(g=>`<div class="panel group"><div class="group-head"><span class="dot" style="background:${g.color}"></span><h3>${g.group}</h3></div>
+    ${g.items.map(it=>it.time?`<div class="ctl"><div class="ctl-top"><label for="c-time">${it.label}</label><output id="o-time" class="num"></output></div><input type="range" id="c-time" min="0" max="1000" step="1"><span class="sub" id="c-time-sub">${it.sub}</span></div>`:
+      `<div class="ctl"><div class="ctl-top"><label for="c-${it.k}">${it.label}</label><output id="o-${it.k}" class="num"></output></div><input type="range" id="c-${it.k}" min="0" max="10" step="${it.step}">${it.ends?`<div class="ends"><span>${it.ends[0]}</span><span>${it.ends[1]}</span></div>`:''}${it.sub?`<span class="sub">${it.sub}</span>`:''}</div>`).join('')}
+    ${g.chips?`<div class="ctl"><span class="ctl-top"><span style="font-weight:700;font-size:15px">Add DIMs and SIMs</span></span><div class="chips" id="quick-chips"></div><a href="#my-plan" class="sub" style="color:var(--accent);font-weight:700">See all DIMs and SIMs</a></div>`:''}</div>`).join('');
+  CONTROLS.forEach(g=>g.items.forEach(it=>{if(it.time)return;$(`#c-${it.k}`).addEventListener('input',e=>{state[it.k]=+e.target.value;state.presetId=null;refresh();});}));
+  $('#c-time').addEventListener('input',e=>setTime(+e.target.value/1000*timeMax(),true));
+  $('#quick-chips').innerHTML=QUICK.map(chipHTML).join('');
+}
+function chipHTML(id){const L=LABELS[id];const tag=L.cat==='dial'?'':`<span class="tag">${L.type==='dim'?'DIM':'SIM'}</span>`;return `<button class="chip ${L.type}${L.chem?' has-chem':''}" data-chip="${id}" aria-pressed="false">${tag}${L.label}${L.chem?`<span class="chem">${L.chem}</span>`:''}</button>`;}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-chip]');if(!b)return;toggleChip(b.dataset.chip);});
+function toggleChip(id){const L=LABELS[id];if(!L)return;const set=L.type==='dim'?state.dims:state.sims;set.has(id)?set.delete(id):set.add(id);save();refresh();}
+
+function setTime(days,apply){state.time=clamp(days,0,timeMax());
+  if(apply){const h=healingAt(state.time);state.damage=h.damage;state.inflam=h.inflam;state.alarm=h.alarm;state.presetId=null;}
+  refresh();}
+
+/* ---------- Presets UI ---------- */
+function buildPresets(){$('#preset-chips').innerHTML=PRESETS.map(p=>`<button class="chip" data-preset="${p.id}" aria-pressed="false">${p.name}</button>`).join('');
+  $('#preset-chips').addEventListener('click',e=>{const b=e.target.closest('[data-preset]');if(!b)return;applyPreset(state,b.dataset.preset);save();refresh();});}
+
+/* ---------- Refresh ---------- */
+function setPill(sel,text,cls){const el=$(sel);if(!el)return;if(el.textContent!==text)el.textContent=text;el.className='pill '+(cls||'');}
+function refresh(){const m=painModel(state);
+  CONTROLS.forEach(g=>g.items.forEach(it=>{if(it.time)return;const inp=$(`#c-${it.k}`);if(+inp.value!==state[it.k])inp.value=state[it.k];$(`#o-${it.k}`).textContent=(+state[it.k]).toFixed(1).replace('.0','');}));
+  const tv=Math.round(state.time/timeMax()*1000);$('#c-time').value=tv;$('#h-time').value=tv;
+  $('#o-time').textContent=fmtTime(state.time);$('#h-time-out').textContent=fmtTime(state.time);
+  $('#c-time-sub').textContent=`Follows the healing curve for: ${TISSUES[state.tissue].label.toLowerCase()}`;
+  $('#h-phase').textContent=phaseAt(state.time);
+  $$('[data-chip]').forEach(b=>{const id=b.dataset.chip;b.setAttribute('aria-pressed',state.dims.has(id)||state.sims.has(id)?'true':'false');});
+  $$('[data-preset]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.preset===state.presetId?'true':'false'));
+  const p=presetById(state.presetId);
+  $('#story-name').textContent=p?p.name:'Your own scenario';
+  $('#story-text').textContent=p?`${p.story} ${p.take}`:'You have changed the sliders. Pick a scenario above to load a story.';
+  explorMeters.set(state.damage,m.P);healMeters.set(state.damage,m.P);planMeters.set(state.damage,m.P);
+  const why=explain(state,m);if($('#why').textContent!==why)$('#why').textContent=why;
+  setPill('#f-gate',m.T<=0?'Closed':m.T<1.5?'Partly open':'Open',m.T<=0?'':m.T<1.5?'part':'open');
+  const gl=guardLevel(state);setPill('#f-guard',GUARD[gl],['','','part','louder'][gl]);
+  setPill('#f-alarm',m.alarm<3?'Quiet':m.alarm<6?'Sounding':'Loud',m.alarm>=6?'louder':m.alarm>=3?'part':'');
+  setPill('#f-touch',m.w<=0?'Just touch':m.w<0.15?'A little danger':'Danger',m.w>=0.15?'louder':m.w>0?'part':'');
+  const bc=m.b>0.6?'quieter':m.b<0.38?'louder':'',ac=m.a>=0.35?'louder':m.a>=0.05?'part':'';
+  setPill('#f-brake',brakeText(m),bc);setPill('#p-brake',brakeText(m),bc);setPill('#f-accel',accelText(m),ac);setPill('#p-accel',accelText(m),ac);
+  const exOn=state.ex>0,exTxt=exOn?`On, ${Math.ceil(state.ex*40)} s left`:'';
+  $('#f-ex-row').hidden=!exOn;$('#p-ex-row').hidden=!exOn;setPill('#f-ex',exTxt,'quieter');setPill('#p-ex',exTxt,'quieter');
+  updateGauge(m);
+  $('#p-dims').textContent=state.dims.size;$('#p-sims').textContent=state.sims.size;$('#p-scn').textContent=p?p.name:'your own scenario';
+  renderChem(m);
+  renderPeaks();
+  cmpRefresh();
+}
+
+/* ---------- Twin Peaks chart ---------- */
+function renderPeaks(){const svg=$('#peaks');const W=680,H=380,L=46,R=118,T=34,B=56,pw=W-L-R,ph=H-T-B;
+  const Td=TISSUES[state.tissue].days,u0=-0.2,u1=1.4;
+  const X=u=>L+(u-u0)/(u1-u0)*pw, Y=v=>T+ph-(v/100)*ph, Xd=d=>X(d/Td);
+  const us=[];for(let i=0;i<=240;i++)us.push(u0+(u1-u0)*i/240);us.push(-1e-6);us.sort((a,b)=>a-b);
+  const tol=us.map(u=>[X(u),Y(tolAt(u))]),thr=us.map(u=>[X(u),Y(thrAt(u))]);
+  const line=pts=>'M'+pts.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join('L');
+  const zone=line(tol)+'L'+thr.slice().reverse().map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join('L')+'Z';
+  const bands=[[0,5],[5,21],[21,Td*u1]].map(([a,b],i)=>{const x0=Math.max(Xd(a),X(0)),x1=Math.min(Xd(b),X(u1));if(x1<=x0)return '';
+    const name=['Inflammation','Proliferation','Remodelling'][i];const w=x1-x0;
+    return `<rect class="peaks-band-${i}" x="${x0.toFixed(1)}" y="${T}" width="${w.toFixed(1)}" height="${ph}"/>${w>78?`<text class="svg-small" x="${(x0+4).toFixed(1)}" y="${T+14}">${name}</text>`:''}`;}).join('');
+  const monthly=state.tissue==='connective',unit=monthly?30.4:7,stepU=monthly?3:1;const ticks=[];
+  for(let k=0;k*unit<=Td*u1+0.1;k+=stepU)ticks.push(k);
+  const tickSvg=ticks.map(k=>{const x=Xd(k*unit);return `<line class="peaks-grid" x1="${x.toFixed(1)}" x2="${x.toFixed(1)}" y1="${T+ph}" y2="${T+ph+5}"/><text class="svg-small" x="${x.toFixed(1)}" y="${T+ph+19}" text-anchor="middle">${k}</text>`;}).join('');
+  const uEnd=u1,tolEnd=Y(tolAt(uEnd)),thrEnd=Y(thrAt(uEnd)),dailyY=Y(40);
+  let ends=[{y:tolEnd,cls:'lab-tol',t:'Tissue tolerance'},{y:thrEnd,cls:'lab-thr',t:'Pain threshold'},{y:dailyY,cls:'svg-sub',t:'Daily activities'}].sort((a,b)=>a.y-b.y);
+  for(let i=1;i<ends.length;i++)if(ends[i].y-ends[i-1].y<17)ends[i].y=ends[i-1].y+17;
+  const un=state.time/Td,xn=X(un),thrNow=thrAt(un),tolNow=tolAt(un);
+  const below=thrNow<40;
+  const call=below?`<g><rect class="callout-box" x="${(X(0)+8).toFixed(1)}" y="${T+24}" width="236" height="44" rx="8"/><text class="svg-label" x="${(X(0)+18).toFixed(1)}" y="${T+42}" style="font-size:13px">Everyday activities can hurt</text><text class="svg-sub" x="${(X(0)+18).toFixed(1)}" y="${T+58}">even though they are safe</text></g>`:'';
+  svg.innerHTML=`${bands}
+   <line class="peaks-axis" x1="${L}" x2="${L}" y1="${T}" y2="${T+ph}"/><line class="peaks-axis" x1="${L}" x2="${L+pw}" y1="${T+ph}" y2="${T+ph}"/>
+   ${tickSvg}
+   <text class="svg-sub" x="${L}" y="${T-14}">Load and stress tolerance</text>
+   <text class="svg-sub" x="${(L+pw/2).toFixed(1)}" y="${H-10}" text-anchor="middle">Time since injury (${monthly?'months':'weeks'})</text>
+   <path class="peaks-zone" d="${zone}"/>
+   <line class="peaks-daily" x1="${L}" x2="${L+pw}" y1="${dailyY}" y2="${dailyY}"/>
+   <path class="peaks-tol" d="${line(tol)}"/><path class="peaks-thr" d="${line(thr)}"/>
+   <line class="peaks-injury" x1="${X(0)}" x2="${X(0)}" y1="${T}" y2="${T+ph}"/><text class="svg-small" x="${X(0)-4}" y="${T+ph-6}" text-anchor="end">Injury</text>
+   <line class="peaks-now" x1="${xn.toFixed(1)}" x2="${xn.toFixed(1)}" y1="${T}" y2="${T+ph}"/>
+   <circle class="dot-tol" cx="${xn.toFixed(1)}" cy="${Y(tolNow).toFixed(1)}" r="5"/><circle class="dot-thr" cx="${xn.toFixed(1)}" cy="${Y(thrNow).toFixed(1)}" r="5"/>
+   ${call}
+   ${ends.map(e=>`<text class="${e.cls}" x="${L+pw+8}" y="${(e.y+4).toFixed(1)}">${e.t}</text>`).join('')}`;
+}
+
+/* ---------- Compare ---------- */
+const cmp=[{dims:new Set(),sims:new Set()},{dims:new Set(),sims:new Set()}];
+applyPreset(cmp[0],'doms');applyPreset(cmp[1],'sprain1');
+const cmpUI=[];
+function buildCompare(){['#cmp-a','#cmp-b'].forEach((sel,i)=>{const host=$(sel);
+  host.innerHTML=`<label class="eyebrow" for="cmp-sel-${i}">Scenario ${i?'B':'A'}</label>
+   <select id="cmp-sel-${i}">${PRESETS.map(p=>`<option value="${p.id}">${p.name}</option>`).join('')}</select>
+   <p class="muted cmp-story"></p><div class="figure-host"></div><div class="meters"></div><p class="take"></p><p class="muted cmp-why" style="font-size:14px"></p>`;
+  const scene=new BodyScene(host.querySelector('.figure-host'),()=>cmp[i],{compact:true,prefix:'c'+i});scenes.push(scene);
+  const mt=makeMeters(host.querySelector('.meters'),true);
+  host.querySelector('select').addEventListener('change',e=>{applyPreset(cmp[i],e.target.value);cmpRefresh();});
+  cmpUI[i]={host,scene,mt};});}
+function cmpRefresh(){cmpUI.forEach((u,i)=>{const s=cmp[i],m=painModel(s),p=presetById(s.presetId);u.host.querySelector('select').value=s.presetId;
+  u.host.querySelector('.cmp-story').textContent=p.story;u.host.querySelector('.take').textContent=p.take;u.host.querySelector('.cmp-why').textContent=explain(s,m);u.mt.set(s.damage,m.P);});}
+
+/* ---------- My plan ---------- */
+function buildPlan(){const host=$('#cats');
+  host.innerHTML=CATS.map(c=>`<div class="cat"><h3>${c.name}</h3><div class="rows">
+     <div class="chips" data-cat="${c.id}">${c.dim.map((_,i)=>chipHTML(`d:${c.id}:${i}`)).join('')}${c.sim.map((_,i)=>chipHTML(`s:${c.id}:${i}`)).join('')}${(store.custom||[]).filter(x=>x.cat===c.id).map(x=>chipHTML(x.id)).join('')}</div>
+     <form class="addrow" data-add="${c.id}"><label class="sr" for="add-${c.id}" style="position:absolute;left:-9999px">Add your own</label><input id="add-${c.id}" placeholder="Add your own" maxlength="60"><button class="btn small" value="dim" type="submit" data-type="dim">Add as DIM</button><button class="btn small" type="button" data-type="sim">Add as SIM</button></form></div></div>`).join('');
+  host.addEventListener('submit',e=>{e.preventDefault();addCustom(e.target,'dim');});
+  host.addEventListener('click',e=>{const b=e.target.closest('button[data-type="sim"]');if(b){e.preventDefault();addCustom(b.closest('form'),'sim');}});
+  $('#dials').innerHTML=DIALS.map((_,i)=>chipHTML(`dial:${i}`)).join('');}
+function addCustom(form,type){const inp=form.querySelector('input'),label=inp.value.trim();if(!label)return;const cat=form.dataset.add;
+  const id='c:'+Date.now().toString(36);LABELS[id]={label,type,cat};store.custom=store.custom||[];store.custom.push({id,label,type,cat});
+  (type==='dim'?state.dims:state.sims).add(id);inp.value='';
+  form.parentElement.querySelector('.chips').insertAdjacentHTML('beforeend',chipHTML(id));save();refresh();}
+function summaryText(){const m=painModel(state);const list=set=>[...set].map(id=>LABELS[id]?'- '+LABELS[id].label:'').filter(Boolean).join('\n')||'- none chosen';
+  return `My pain plan (PACE Health · Understanding Pain)\n\nDoes pain mean damage? First answer: ${store.q1||'not answered'}\nWhen is pain helpful? ${store.q2||'-'}\nWhen is pain unhelpful? ${store.q3||'-'}\n\nMy DIMs (Danger In Me):\n${list(state.dims)}\n\nMy SIMs (Safety In Me):\n${list(state.sims)}\n\nWhat surprised me: ${store.r1||'-'}\nThe SIM I will add this week: ${store.r2||'-'}\n\nBrake: ${brakeText(m)}. Accelerator: ${accelText(m)}.`;}
+function toast(msg){const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2200);}
+
+/* ---------- Start questions ---------- */
+function bindQuestions(){
+  $('#q1').addEventListener('click',e=>{const b=e.target.closest('[data-q1]');if(!b)return;store.q1=b.dataset.q1;save();syncQ();});
+  ['q2','q3','r1','r2'].forEach(k=>{const el=$('#'+k);el.value=store[k]||'';el.addEventListener('input',()=>{store[k]=el.value;save();syncQ();});});
+  syncQ();}
+function syncQ(){$$('[data-q1]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.q1===store.q1?'true':'false'));
+  $('#rv-q1').textContent=store.q1?`Your first answer: ${store.q1}.`:'You did not answer at the start.';
+  $('#rv-q2').textContent=store.q2?`Your first answer: ${store.q2}`:'You did not answer at the start.';
+  $('#rv-q3').textContent=store.q3?`Your first answer: ${store.q3}`:'You did not answer at the start.';}
+
+/* ---------- Routing ---------- */
+const VIEWS=['start','explore','compare','healing','my-plan'];
+function route(){let v=(location.hash||'').slice(1);if(!VIEWS.includes(v))v='start';
+  VIEWS.forEach(n=>$('#view-'+n).hidden=n!==v);
+  $$('.nav a').forEach(a=>{if(a.dataset.view===v)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
+  refresh();}
+function go(v){if(location.hash!=='#'+v)location.hash=v;else route();}
+
+/* ---------- Figure views ---------- */
+const HINTS={body:'Tap the ankle to send a signal. Filled dots are danger signals; hollow dots are touch. Small signals fade at the gate. Blue and orange dots coming down are the brake and the accelerator.',
+  ankle:'Immune cells gather at an injury and release chemicals. The more there are, the more awake the guard dog, and the more easily the sensor fires.',
+  gate:'Danger and touch signals arrive from the left. The brain’s brake (blue) and accelerator (orange) arrive from the right. When the fire alarm cells are active, touch can pass the gate as danger.'};
+function setView(v){$('#body-scene').hidden=v!=='body';$('#ankle-scene').hidden=v!=='ankle';$('#zoom-scene').hidden=v!=='gate';
+  [['#v-body','body'],['#v-ankle','ankle'],['#v-gate','gate']].forEach(([sel,k])=>$(sel).setAttribute('aria-pressed',String(k===v)));
+  $('#figure-hint').textContent=HINTS[v];}
+
+/* ---------- Tour ---------- */
+const TOUR=[
+  {view:'explore',preset:'everyday',fig:'body',hl:'sensor',title:'Meet the sensor',text:'Sensors (nociceptors) in your tissues send small signals all the time. Tap the ankle, or press Send a signal, to send a bigger one.'},
+  {view:'explore',preset:'sprain1',fig:'ankle',hl:'dog',title:'The guard dog',text:'After an injury, immune cells crowd around the nerve ending and release chemicals. The guard dog wakes up and barks at smaller things. This is normal and helps healing.'},
+  {view:'explore',preset:'everyday',fig:'body',hl:'gate',title:'Most signals stop at the gate',text:'Where the nerve meets the spinal cord, the gate filters signals. Quiet ones shrink and fade here, so the brain never hears them.'},
+  {view:'explore',preset:'sprain1',fig:'body',hl:'cord',title:'A strong signal gets through',text:'A sprained ankle sends loud signals. They pass the gate and travel up the spinal cord to the brain.'},
+  {view:'explore',preset:'sprain1',fig:'body',hl:'brain',title:'Threat or no threat?',text:'The brain weighs the signal against everything else it knows: past experience, beliefs, stress, what you see and hear. Pain is its decision to protect you.'},
+  {view:'explore',preset:'sprainworst',fig:'body',hl:'dial',title:'The brake and the accelerator',text:'The brain works the gate with a brake and an accelerator. Feeling safe applies the brake. Worry and stress press the accelerator. Watch the two bars under the dial.'},
+  {view:'explore',preset:'touch',fig:'gate',hl:'alarm',title:'When touch starts to hurt',text:'In persistent pain, microglia and astrocytes at the gate can stay switched on. The gate starts reading touch and movement as danger, so a sock or a bedsheet can hurt with no damage.'},
+  {view:'compare',pair:['sprain1','midgame'],title:'Same damage, different pain',text:'Both people have real damage at the ankle. Compare their pain. Feeling safe and focused elsewhere puts the brake on.'},
+  {view:'my-plan',title:'Your dials',text:'Many of these dials are ones you can turn. Press Do 10 minutes of exercise and watch the brake get stronger.'}
+];
+let tourStep=-1;
+const allFigs=()=>[bodyScene,ankleScene,zoomScene];
+function showTour(i){tourStep=i;const st=TOUR[i];$('#tour').hidden=false;
+  if(st.preset)applyPreset(state,st.preset,false);
+  if(st.pair){applyPreset(cmp[0],st.pair[0]);applyPreset(cmp[1],st.pair[1]);}
+  setView(st.fig||'body');
+  allFigs().forEach(s=>s.highlight(st.hl||null));
+  $('#tour-step').textContent=`Step ${i+1} of ${TOUR.length}`;$('#tour-title').textContent=st.title;$('#tour-text').textContent=st.text;
+  $('#tour-dots').innerHTML=TOUR.map((_,k)=>`<i class="${k===i?'on':''}"></i>`).join('');
+  $('#tour-back').disabled=i===0;$('#tour-next').textContent=i===TOUR.length-1?'Finish':'Next';
+  go(st.view);refresh();}
+function endTour(){tourStep=-1;$('#tour').hidden=true;allFigs().forEach(s=>s.highlight(null));}
+
+/* ---------- Boot ---------- */
+const scenes=[];
+load();
+applyPreset(state,'sprain1',false);
+const explorMeters=makeMeters($('#explore-meters'),false);
+const healMeters=makeMeters($('#healing-meters'),true);
+const planMeters=makeMeters($('#plan-meters'),false);
+buildControls();buildPresets();buildPlan();bindQuestions();buildGauge();
+const bodyScene=new BodyScene($('#body-scene'),()=>state,{prefix:'b'});scenes.push(bodyScene);
+const startScene=new BodyScene($('#start-scene'),()=>state,{prefix:'st'});scenes.push(startScene);
+const zoomScene=new ZoomScene($('#zoom-scene'),()=>state);scenes.push(zoomScene);
+const ankleScene=new AnkleScene($('#ankle-scene'),()=>state);scenes.push(ankleScene);
+buildCompare();
+setView('body');
+
+$('#v-body').addEventListener('click',()=>setView('body'));
+$('#v-ankle').addEventListener('click',()=>setView('ankle'));
+$('#v-gate').addEventListener('click',()=>setView('gate'));
+$('#poke').addEventListener('click',()=>{const sc=allFigs().find(s=>s.visible());if(sc)sc.poke();});
+$('#reset').addEventListener('click',()=>{applyPreset(state,'sprain1');state.ex=0;setView('body');save();refresh();});
+document.addEventListener('click',e=>{if(e.target.closest('[data-exercise]')){state.ex=1;toast('Exercise effect on. It fades over about 40 seconds.');refresh();}});
+$('#tissue-seg').addEventListener('click',e=>{const b=e.target.closest('[data-tissue]');if(!b)return;const frac=state.time/timeMax();state.tissue=b.dataset.tissue;$$('#tissue-seg button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));setTime(frac*timeMax(),true);});
+$('#path-seg').addEventListener('click',e=>{const b=e.target.closest('[data-path]');if(!b)return;state.path=b.dataset.path;$$('#path-seg button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));setTime(state.time,true);});
+$('#graded').addEventListener('change',e=>{state.graded=e.target.checked;setTime(state.time,true);});
+$('#h-time').addEventListener('input',e=>setTime(+e.target.value/1000*timeMax(),true));
+$('#start-tour').addEventListener('click',()=>showTour(0));
+$('#tour-next').addEventListener('click',()=>tourStep>=TOUR.length-1?endTour():showTour(tourStep+1));
+$('#tour-back').addEventListener('click',()=>tourStep>0&&showTour(tourStep-1));
+$('#tour-close').addEventListener('click',endTour);
+$('#copy-summary').addEventListener('click',()=>{const txt=summaryText();const fb=$('#summary-fallback');
+  const fallback=()=>{fb.hidden=false;fb.value=txt;fb.focus();fb.select();toast('Select all and copy the text below');};
+  try{navigator.clipboard.writeText(txt).then(()=>{fb.hidden=true;toast('Summary copied');},fallback);}catch(err){fallback();}});
+window.addEventListener('hashchange',route);
+route();
+
+let last=performance.now(),exTick=0;
+function frame(now){const dt=Math.min(0.05,(now-last)/1000);last=now;
+  if(state.ex>0){state.ex=Math.max(0,state.ex-dt/40);exTick+=dt;if(exTick>0.25||state.ex===0){exTick=0;refresh();}}
+  for(const s of scenes)if(s.visible())s.step(dt);stepMeters(dt);requestAnimationFrame(frame);}
+requestAnimationFrame(frame);
+</script>
+
+
+</body>
+</html>
